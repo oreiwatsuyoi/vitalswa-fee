@@ -4678,18 +4678,21 @@ function setupCalculator() {
     });
   }
   
-  function convertCurrency() {
+  async function convertCurrency() {
     const amount = parseFloat(amountInput.value) || 0;
     const fromCurrency = currencySelect.value;
     const toCurrency = targetCurrencySelect.value;
     
-    if (amount > 0 && exchangeRates[fromCurrency] && exchangeRates[toCurrency]) {
+    if (amount > 0 && fromCurrency !== toCurrency) {
       currencyConverter.style.display = 'block';
-      const fromRate = exchangeRates[fromCurrency].rate;
-      const toRate = exchangeRates[toCurrency].rate;
-      const convertedAmount = (amount / fromRate) * toRate;
-      const symbol = exchangeRates[toCurrency].symbol;
-      convertedAmountEl.textContent = `${symbol}${convertedAmount.toFixed(2)}`;
+      
+      try {
+        const convertedAmount = await convertCurrencyAmount(amount, fromCurrency, toCurrency);
+        const symbol = getCurrencySymbol(toCurrency);
+        convertedAmountEl.textContent = `${symbol}${convertedAmount.toFixed(2)}`;
+      } catch (error) {
+        convertedAmountEl.textContent = 'Conversion unavailable';
+      }
     } else {
       currencyConverter.style.display = 'none';
     }
