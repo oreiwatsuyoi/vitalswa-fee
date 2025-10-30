@@ -1,0 +1,52 @@
+{
+  "rules": {
+    "agents": {
+      ".read": true,
+      ".write": true
+    },
+    "sessions": {
+      ".read": true,
+      ".write": true
+    },
+    "access-codes": {
+      ".read": true,
+      ".write": true
+    },
+    "analytics": {
+      ".read": true,
+      ".write": true
+    },
+    "rooms": {
+      "$roomId": {
+        ".read": true,
+        ".write": true,
+        "offer": {
+          ".write": "!data.exists() && newData.exists()",
+          ".validate": "newData.hasChildren(['type', 'sdp']) && newData.child('type').isString() && newData.child('sdp').isString()"
+        },
+        "answer": {
+          ".write": "root.child('rooms').child($roomId).child('offer').exists() && !data.exists() && newData.exists()",
+          ".validate": "newData.hasChildren(['type', 'sdp']) && newData.child('type').isString() && newData.child('sdp').isString()"
+        },
+        "candidates": {
+          ".write": "root.child('rooms').child($roomId).child('offer').exists()",
+          "$candidateId": {
+            ".validate": "newData.hasChildren(['candidate', 'sdpMid', 'sdpMLineIndex'])"
+          }
+        },
+        "hostId": {
+          ".write": true
+        },
+        "users": {
+          ".write": true
+        },
+        "signaling": {
+          ".write": true
+        },
+        "messages": {
+          ".write": true
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "vitalswap-fee-calculator",
+  "version": "1.0.0",
+  "description": "VitalSwap transparent fee calculator with AI assistance",
+  "main": "index.html",
+  "dependencies": {
+    "@google/generative-ai": "^0.2.1"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site - no build needed'",
+    "start": "vercel dev"
+  },
+  "keywords": ["vitalswap", "fees", "calculator", "ai", "fintech"],
+  "author": "VitalSwap",
+  "license": "MIT"
+}

@@ -1,0 +1,16 @@
+# Dependencies
+/node_modules
+
+# Local settings and secrets
+# This file contains connection strings and should not be committed to source control
+/local.settings.json
+/public/config.js
+
+# Build output
+/dist
+/tmp
+
+# IDE and OS files
+.vscode/
+*.log
+.vercel

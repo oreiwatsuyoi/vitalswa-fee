@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureBank Agent Dashboard - Professional Banking Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23003d82'%3E%3Cpath d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'/%3E%3C/svg%3E">
+    
+    <style>
+        :root {
+            --primary-blue: #003d82;
+            --secondary-blue: #0066cc;
+            --light-blue: #e6f2ff;
+            --accent-blue: #4d94ff;
+            --pure-white: #ffffff;
+            --off-white: #fafbfc;
+            --light-gray: #f5f7fa;
+            --medium-gray: #8b9dc3;
+            --dark-gray: #2c3e50;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --success-green: #00c851;
+            --warning-orange: #ff8800;
+            --error-red: #ff4444;
+            --purple: #6f42c1;
+            --teal: #20c997;
+            --shadow-light: 0 2px 8px rgba(0, 61, 130, 0.08);
+            --shadow-medium: 0 4px 16px rgba(0, 61, 130, 0.12);
+            --shadow-heavy: 0 8px 32px rgba(0, 61, 130, 0.16);
+            --shadow-intense: 0 12px 48px rgba(0, 61, 130, 0.20);
+            --border-radius: 12px;
+            --border-radius-large: 20px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            --gradient-success: linear-gradient(135deg, var(--success-green), #00a041);
+            --gradient-purple: linear-gradient(135deg, var(--purple), #8b5cf6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--pure-white) 50%, var(--off-white) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: var(--pure-white);
+            box-shadow: var(--shadow-medium);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 80px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--primary-blue);
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            transition: var(--transition);
+        }
+
+        .header-nav.mobile-open {
+            position: absolute;
+            top: 80px;
+            left: 0;
+            right: 0;
+            background: var(--pure-white);
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: var(--shadow-medium);
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary-blue);
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+
+
+        .nav-item {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+
+        .agent-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: var(--off-white);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .agent-profile:hover {
+            background: var(--light-blue);
+        }
+
+        .agent-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .agent-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .agent-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Main Layout */
+        .main-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 32px;
+            display: flex;
+            gap: 32px;
+            min-height: calc(100vh - 80px);
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .sidebar {
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            flex-shrink: 0;
+        }
+
+        .dashboard-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--pure-white);
+            border-radius: var(--border-radius-large);
+            box-shadow: var(--shadow-medium);
+            padding: 32px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-heavy);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--pure-white);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--shadow-light);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-change.positive {
+            color: var(--success-green);
+        }
+
+        .stat-change.negative {
+            color: var(--error-red);
+        }
+
+        /* Code Generation */
+        .code-generator {
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: var(--border-radius-large);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .code-display {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            margin: 20px 0;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .access-code {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: 8px;
+            margin-bottom: 12px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-info {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--pure-white);
+            color: var(--primary-blue);
+        }
+
+        .btn-primary:hover {
+            background: var(--off-white);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-success {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* QR Code */
+        .qr-container {
+            background: var(--pure-white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        #qr-code {
+            margin: 0 auto;
+        }
+
+        /* Active Sessions */
+        .sessions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+        
+        .sessions-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .sessions-list::-webkit-scrollbar-track {
+            background: var(--light-gray);
+            border-radius: 3px;
+        }
+        
+        .sessions-list::-webkit-scrollbar-thumb {
+            background: var(--medium-gray);
+            border-radius: 3px;
+        }
+        
+        .sessions-list::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-blue);
+        }
+
+        .session-item {
+            background: var(--off-white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            border-left: 4px solid var(--success-green);
+            transition: var(--transition);
+        }
+
+        .session-item:hover {
+            background: var(--light-blue);
+            transform: translateX(4px);
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .session-code {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--primary-blue);
+            font-size: 16px;
+        }
+
+        .session-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .status-waiting {
+            background: var(--warning-orange);
+            color: white;
+        }
+
+        .status-ended {
+            background: var(--medium-gray);
+            color: white;
+        }
+
+        .session-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .session-detail {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Agent List */
+        .agent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .agent-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--off-white);
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .agent-item:hover {
+            background: var(--light-blue);
+        }
+
+        .agent-status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-online {
+            background: var(--success-green);
+            box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.2);
+        }
+
+        .status-busy {
+            background: var(--error-red);
+            box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.2);
+        }
+
+        .status-away {
+            background: var(--warning-orange);
+            box-shadow: 0 0 0 3px rgba(255, 136, 0, 0.2);
+        }
+
+        .agent-details {
+            flex: 1;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .agent-role {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .agent-sessions {
+            font-size: 12px;
+            color: var(--primary-blue);
+            font-weight: 500;
+        }
+
+        /* AI Chat Integration */
+        .ai-chat-panel {
+            background: var(--gradient-purple);
+            color: white;
+            border-radius: var(--border-radius-large);
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-chat-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .ai-chat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .ai-status {
+            width: 8px;
+            height: 8px;
+            background: var(--success-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .ai-input-container {
+            position: relative;
+        }
+
+        .ai-input {
+            width: 100%;
+            padding: 16px 50px 16px 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+        .ai-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .ai-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .ai-send-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .ai-send-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Notifications */
+        .notification-panel {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            border-bottom: 1px solid var(--light-gray);
+            transition: var(--transition);
+        }
+
+        .notification-item:hover {
+            background: var(--off-white);
+        }
+
+        .notification-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .notification-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: var(--medium-gray);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--pure-white);
+            border-radius: var(--border-radius-large);
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-intense);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            background: var(--light-gray);
+            color: var(--text-primary);
+        }
+
+        /* Team Status Optimization */
+        .agent-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .agent-item {
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .agent-details {
+            min-width: 0;
+        }
+
+        .agent-name {
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .agent-role {
+            font-size: 11px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .main-container {
+                flex-direction: column;
+                gap: 24px;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .content-area {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 16px;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .header-nav {
+                display: none;
+            }
+
+            .header-nav.mobile-open {
+                display: flex;
+            }
+
+            .main-container {
+                padding: 16px;
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+
+            .content-area {
+                order: 1;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 12px;
+            }
+
+            .code-actions {
+                flex-direction: column;
+            }
+
+            .access-code {
+                font-size: 32px;
+                letter-spacing: 4px;
+            }
+
+            .ai-chat-panel {
+                padding: 20px;
+            }
+        }
+
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .content-section.hidden {
+            display: none;
+        }
+
+        /* Table Styles */
+        table {
+            font-size: 14px;
+        }
+
+        table th {
+            color: var(--text-primary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        table td {
+            color: var(--text-secondary);
+        }
+
+        table tr:hover {
+            background: var(--light-blue);
+        }
+
+        /* Settings Styles */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .styled-input {
+            padding: 12px 16px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            background: var(--pure-white);
+            font-size: 14px;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .styled-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 61, 130, 0.1);
+        }
+
+        .styled-select {
+            padding: 12px 16px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            background: var(--pure-white);
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .styled-select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 61, 130, 0.1);
+        }
+
+        .specializations-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .specialization-tag {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--off-white);
+            border: 2px solid var(--light-gray);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .specialization-tag:hover {
+            border-color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+
+        .specialization-tag.active {
+            background: var(--primary-blue);
+            border-color: var(--primary-blue);
+            color: white;
+        }
+
+        .specialization-tag i {
+            font-size: 12px;
+        }
+
+        .preference-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--off-white);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--light-gray);
+        }
+
+        .preference-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .preference-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .preference-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--medium-gray);
+            transition: var(--transition);
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary-blue);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Utilities */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-0 { margin-bottom: 0; }
+        .mb-1 { margin-bottom: 8px; }
+        .mb-2 { margin-bottom: 16px; }
+        .mb-3 { margin-bottom: 24px; }
+
+        .mt-0 { margin-top: 0; }
+        .mt-1 { margin-top: 8px; }
+        .mt-2 { margin-top: 16px; }
+        .mt-3 { margin-top: 24px; }
+    </style>
+
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://kit.fontawesome.com/214a77b0b7.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <img src="https://images.vitalswap.com/pay-with-vitalswap/1.png" alt="VitalSwap Logo" style="width: 48px; height: 48px; border-radius: 12px;">
+                <div>
+                    <div>VitalSwap</div>
+                    <div style="font-size: 12px; font-weight: 400; color: var(--text-secondary);">Agent Dashboard</div>
+                </div>
+            </div>
+            
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <nav class="header-nav" id="header-nav">
+                <a href="#dashboard" class="nav-item active" onclick="showSection('dashboard')">Dashboard</a>
+                <a href="#sessions" class="nav-item" onclick="showSection('sessions')">Sessions</a>
+                <a href="#analytics" class="nav-item" onclick="showSection('analytics')">Analytics</a>
+                <a href="#settings" class="nav-item" onclick="showSection('settings')">Settings</a>
+            </nav>
+
+            <div class="agent-profile" onclick="showAgentProfile()">
+                <div class="agent-avatar" id="current-agent-avatar"></div>
+                <div class="agent-info">
+                    <h4 id="current-agent-name">Please sign in</h4>
+                    <p id="current-agent-status">Not signed in</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="content-section">
+                <div class="dashboard-content">
+                    <!-- Code Generator -->
+                    <div class="code-generator">
+                        <div class="card-header" style="color: white; margin-bottom: 0;">
+                            <div>
+                                <h2 class="card-title" style="color: white;">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Generate Access Code
+                                </h2>
+                                <p class="card-subtitle" style="color: rgba(255,255,255,0.8);">Create secure access codes for customer sessions</p>
+                            </div>
+                            <button class="btn btn-secondary" onclick="generateNewCode()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                Generate New
+                            </button>
+                        </div>
+
+                        <div class="code-display">
+                            <div class="access-code" id="current-access-code">ABC123</div>
+                            <div class="code-info">
+                                <div>Valid for: <span id="code-expiry">30 minutes</span></div>
+                                <div>Created: <span id="code-created">Just now</span></div>
+                            </div>
+                            
+                            <div class="code-actions">
+                                <button class="btn btn-success" onclick="joinSessionWithCode()">
+                                    <i class="fas fa-video"></i>
+                                    Join Session
+                                </button>
+                                <button class="btn btn-primary" onclick="copyCode()">
+                                    <i class="fas fa-copy"></i>
+                                    Copy Code
+                                </button>
+                                <button class="btn btn-secondary" onclick="copyLink()">
+                                    <i class="fas fa-link"></i>
+                                    Copy Link
+                                </button>
+                                <button class="btn btn-secondary" onclick="showQRCode()">
+                                    <i class="fas fa-qrcode"></i>
+                                    QR Code
+                                </button>
+                                <button class="btn btn-primary" onclick="sendToCustomer()">
+                                    <i class="fas fa-envelope"></i>
+                                    Send Email
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="qr-container hidden" id="qr-container">
+                            <h4 style="margin-bottom: 16px; color: var(--text-primary);">QR Code for Customer Access</h4>
+                            <div id="qr-code"></div>
+                            <p style="margin-top: 12px; font-size: 12px; color: var(--text-secondary);">
+                                Customer can scan this QR code to join the session instantly
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Active Sessions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                    </svg>
+                                    Active Sessions
+                                </h2>
+                                <p class="card-subtitle">Monitor ongoing customer consultations</p>
+                            </div>
+                            <div style="display: flex; gap: 12px;">
+                                <button class="btn btn-success" onclick="refreshSessions()">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    Refresh
+                                </button>
+                                <button class="btn btn-primary" onclick="showAgentCustomerChat()">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                    </svg>
+                                    Customer Chat
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="sessions-list" id="sessions-list">
+                            <!-- Sessions will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sessions Section -->
+            <div id="sessions-section" class="content-section hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Session History
+                            </h2>
+                            <p class="card-subtitle">Complete history of all customer sessions</p>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <select class="device-select" style="width: auto; padding: 8px 12px;">
+                                <option>Last 7 days</option>
+                                <option>Last 30 days</option>
+                                <option>Last 3 months</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="exportSessions()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14,2 14,8 20,8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                    <polyline points="10,9 9,9 8,9"/>
+                                </svg>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+                    <div id="session-history-table">
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: var(--off-white); border-bottom: 2px solid var(--light-gray);">
+                                        <th style="padding: 12px; text-align: left; font-weight: 600;">Session ID</th>
+                                        <th style="padding: 12px; text-align: left; font-weight: 600;">Customer</th>
+                                        <th style="padding: 12px; text-align: left; font-weight: 600;">Duration</th>
+                                        <th style="padding: 12px; text-align: left; font-weight: 600;">Quality</th>
+                                        <th style="padding: 12px; text-align: left; font-weight: 600;">Date</th>
+                                        <th style="padding: 12px; text-align: left; font-weight: 600;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="session-history-body">
+                                    <!-- Real session history will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analytics-section" class="content-section hidden">
+                <div class="stats-grid" id="analytics-stats">
+                    <!-- Real analytics stats will be populated here -->
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                                Performance Analytics
+                            </h2>
+                            <p class="card-subtitle">Detailed performance metrics and trends</p>
+                        </div>
+                    </div>
+                    <div id="analytics-details">
+                        <!-- Real analytics details will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings-section" class="content-section hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                Agent Settings
+                            </h2>
+                            <p class="card-subtitle">Configure your agent profile and preferences</p>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+                        <div>
+                            <h4 style="margin-bottom: 16px; color: var(--primary-blue);">Profile Information</h4>
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
+                                <div class="input-group">
+                                    <label class="input-label">Display Name</label>
+                                    <input type="text" id="agent-display-name" value="" placeholder="Enter your name" class="styled-input">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Job Title</label>
+                                    <input type="text" id="agent-job-title" value="" placeholder="Enter your job title" class="styled-input">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Specializations</label>
+                                    <div class="specializations-container">
+                                        <div class="specialization-tag active" data-spec="Personal Banking">
+                                            <span>Personal Banking</span>
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <div class="specialization-tag active" data-spec="Loans & Mortgages">
+                                            <span>Loans & Mortgages</span>
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <div class="specialization-tag" data-spec="Investment Services">
+                                            <span>Investment Services</span>
+                                            <i class="fas fa-plus"></i>
+                                        </div>
+                                        <div class="specialization-tag" data-spec="Business Banking">
+                                            <span>Business Banking</span>
+                                            <i class="fas fa-plus"></i>
+                                        </div>
+                                        <div class="specialization-tag" data-spec="Credit Cards">
+                                            <span>Credit Cards</span>
+                                            <i class="fas fa-plus"></i>
+                                        </div>
+                                        <div class="specialization-tag" data-spec="Wealth Management">
+                                            <span>Wealth Management</span>
+                                            <i class="fas fa-plus"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="margin-bottom: 16px; color: var(--primary-blue);">Preferences</h4>
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
+                                <div class="preference-item">
+                                    <div class="preference-info">
+                                        <span class="preference-title">Email Notifications</span>
+                                        <span class="preference-desc">Receive email alerts for new sessions</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="email-notifications" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="preference-item">
+                                    <div class="preference-info">
+                                        <span class="preference-title">Sound Alerts</span>
+                                        <span class="preference-desc">Play sound when customers join</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="sound-alerts" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="preference-item">
+                                    <div class="preference-info">
+                                        <span class="preference-title">Auto-Accept Sessions</span>
+                                        <span class="preference-desc">Automatically join when customers connect</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="auto-accept">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Max Concurrent Sessions</label>
+                                    <select id="max-sessions" class="styled-select">
+                                        <option value="1">1 Session</option>
+                                        <option value="2">2 Sessions</option>
+                                        <option value="3" selected>3 Sessions</option>
+                                        <option value="4">4 Sessions</option>
+                                        <option value="5">5 Sessions</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--light-gray); display: flex; gap: 12px;">
+                        <button class="btn btn-primary" onclick="saveSettings()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                                <polyline points="17,21 17,13 7,13 7,21"/>
+                                <polyline points="7,3 7,8 15,8"/>
+                            </svg>
+                            Save Changes
+                        </button>
+                        <button class="btn btn-secondary" onclick="resetSettings()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            Reset to Default
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- AI Chat Assistant -->
+            <div class="ai-chat-panel">
+                <div class="ai-chat-header">
+                    <div>
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 600;">AI Assistant</h3>
+                        <p style="margin: 0; font-size: 12px; opacity: 0.8;">Powered by Gemini AI</p>
+                    </div>
+                    <div class="ai-status"></div>
+                </div>
+                
+                <div class="ai-input-container">
+                    <input 
+                        type="text" 
+                        class="ai-input" 
+                        id="ai-input"
+                        placeholder="Ask AI for help with customer queries..."
+                        onkeypress="handleAIKeypress(event)"
+                    >
+                    <button class="ai-send-btn" onclick="sendAIQuery()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div id="ai-response" style="margin-top: 16px; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 8px; display: none;">
+                    <div style="font-size: 14px; line-height: 1.5;"></div>
+                </div>
+            </div>
+
+            <!-- Other Agents -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                            </svg>
+                            Team Status
+                        </h3>
+                        <p class="card-subtitle">Other agents currently online</p>
+                    </div>
+                </div>
+
+                <div class="agent-list" id="agent-list">
+                    <!-- Agents will be populated here -->
+                </div>
+            </div>
+
+            <!-- Recent Notifications -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
+                            Notifications
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="notification-panel" id="notification-panel">
+                    <!-- Notifications will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div class="modal" id="qr-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Customer Access QR Code</h3>
+                <button class="close-btn" onclick="closeModal('qr-modal')">&times;</button>
+            </div>
+            <div class="text-center">
+                <div id="modal-qr-code" style="margin: 20px 0;"></div>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    Customer can scan this QR code with their phone to join the session
+                </p>
+                <div style="background: var(--light-gray); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                    <strong>Access Code:</strong> <span id="modal-access-code" style="font-family: monospace; font-size: 18px; color: var(--primary-blue);"></span>
+                </div>
+                <button class="btn btn-primary" onclick="downloadQR()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                    </svg>
+                    Download QR Code
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase and Core Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="config.js"></script>
+    <script src="env-config.js"></script>
+    <script src="agent-dashboard.js"></script>
+</body>
+</html>

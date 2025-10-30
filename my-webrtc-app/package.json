@@ -1,0 +1,41 @@
+{
+  "name": "securebank-virtual-booth",
+  "version": "1.0.0",
+  "description": "Premium virtual banking consultation platform with secure video calling and professional UI design.",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "webrtc",
+    "banking",
+    "video-calling",
+    "virtual-booth",
+    "firebase",
+    "consultation",
+    "secure",
+    "responsive"
+  ],
+  "author": "SecureBank Development Team",
+  "scripts": {
+    "start": "python -m http.server 3000 --directory public",
+    "build": "node generate-config.mjs",
+    "deploy": "vercel",
+    "deploy:prod": "vercel --prod",
+    "test": "echo \"No tests specified\" && exit 0",
+    "lint": "echo \"Linting not configured\" && exit 0"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.7"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/securebank/virtual-booth.git"
+  },
+  "bugs": {
+    "url": "https://github.com/securebank/virtual-booth/issues"
+  },
+  "homepage": "https://securebank-virtual-booth.vercel.app"
+}
