@@ -1112,6 +1112,12 @@ nav {
   padding: 0 2rem;
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 0 0.5rem;
+  }
+}
+
 
 
 .section-header {
@@ -1209,21 +1215,42 @@ nav {
   }
   
   .calculator {
-    padding: 4rem 0.5rem;
+    padding: 4rem 1rem;
     width: 100%;
   }
   
   .calculator-container {
-    padding: -2rem 0.5rem;
+    padding: 2rem 1rem;
+    margin: 0;
+    max-width: none;
+    width: 100%;
   }
   
   .calculator-grid {
-    grid-template-columns: 1fr;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+  
+  .calculator-grid .input-group {
+    width: 100% !important;
+    flex: none !important;
   }
   
   .input-field,
   .select-field {
     width: 100%;
+    padding: 1.2rem 1.5rem;
+    font-size: 1.1rem;
+    min-height: 50px;
+  }
+  
+  .select-field {
+    padding-right: 3.5rem;
+  }
+  
+  .input-group {
+    margin-bottom: 2rem;
   }
 }
 
@@ -1474,11 +1501,7 @@ nav {
   border: 2px solid rgba(37, 99, 235, 0.1);
 }
 
-@media (max-width: 768px) {
-  .calculator-grid {
-    grid-template-columns: 1fr;
-  }
-}
+
 
 .input-field:focus {
   outline: none;
@@ -3531,14 +3554,7 @@ function getStaticExchangeRates() {
   console.log('🔄 FALLBACK: Using static exchange rates (API failed)');
   return {
     'USD': { rate: 1, symbol: '$', name: 'US Dollar' },
-    'EUR': { rate: 0.85, symbol: '€', name: 'Euro' },
-    'GBP': { rate: 0.73, symbol: '£', name: 'British Pound' },
-    'JPY': { rate: 110, symbol: '¥', name: 'Japanese Yen' },
-    'CAD': { rate: 1.25, symbol: 'C$', name: 'Canadian Dollar' },
-    'AUD': { rate: 1.35, symbol: 'A$', name: 'Australian Dollar' },
-    'CHF': { rate: 0.92, symbol: 'CHF', name: 'Swiss Franc' },
-    'CNY': { rate: 6.45, symbol: '¥', name: 'Chinese Yuan' },
-    'NGN': { rate: 411, symbol: '₦', name: 'Nigerian Naira' }
+    'NGN': { rate: 1600, symbol: '₦', name: 'Nigerian Naira' }
   };
 }
 
@@ -4184,13 +4200,6 @@ function showUpdateNotification(service, fee) {
         <div class="input-group">
           <select class="select-field" id="currency">
             <option value="USD">USD ($)</option>
-            <option value="EUR">EUR (€)</option>
-            <option value="GBP">GBP (£)</option>
-            <option value="JPY">JPY (¥)</option>
-            <option value="CAD">CAD (C$)</option>
-            <option value="AUD">AUD (A$)</option>
-            <option value="CHF">CHF</option>
-            <option value="CNY">CNY (¥)</option>
             <option value="NGN">NGN (₦)</option>
           </select>
         </div>
@@ -4201,13 +4210,6 @@ function showUpdateNotification(service, fee) {
           <div class="converter-amount" id="convertedAmount">0.00</div>
           <select class="select-field" id="targetCurrency">
             <option value="USD">USD ($)</option>
-            <option value="EUR">EUR (€)</option>
-            <option value="GBP">GBP (£)</option>
-            <option value="JPY">JPY (¥)</option>
-            <option value="CAD">CAD (C$)</option>
-            <option value="AUD">AUD (A$)</option>
-            <option value="CHF">CHF</option>
-            <option value="CNY">CNY (¥)</option>
             <option value="NGN">NGN (₦)</option>
           </select>
         </div>
@@ -4593,6 +4595,11 @@ function setupCalculator() {
       return;
     }
     
+    // Auto-set currency to NGN for NGN services (optional - user can still change)
+    if (serviceType === 'NG Virtual Bank Account' && currencySelect.value === 'USD') {
+      currencySelect.value = 'NGN';
+    }
+    
     const specificServices = feeData[accountType][serviceType] || [];
     specificServiceSelect.innerHTML = '<option value="">Select Specific Fee</option>';
     
@@ -4621,65 +4628,82 @@ function setupCalculator() {
     }
   }
   
-  function calculateFee() {
+  // Helper function to convert currency using ONLY live API rates
+  async function convertCurrencyAmount(amount, fromCurrency, toCurrency) {
+    if (fromCurrency === toCurrency) return amount;
+    
+    try {
+      // Use VitalSwap's live API for conversion
+      const response = await fetch(`https://2kbbumlxz3.execute-api.us-east-1.amazonaws.com/default/exchange?from=${fromCurrency}&to=${toCurrency}`);
+      const data = await response.json();
+      
+      if (data.error) {
+        console.error('Live API conversion failed:', data.error);
+        return 0; // Return 0 if conversion fails
+      }
+      
+      // Use the live rate from API
+      const rate = data.rate || data.conversion_rate || data[toCurrency]?.rate;
+      if (rate) {
+        return amount * rate;
+      }
+      
+      console.error('No conversion rate found in API response');
+      return 0;
+    } catch (error) {
+      console.error('Currency conversion API failed:', error);
+      return 0; // Return 0 if API fails
+    }
+  }
+  
+  // Helper function to get currency symbol
+  function getCurrencySymbol(currency) {
+    if (exchangeRates[currency]) {
+      return exchangeRates[currency].symbol;
+    }
+    // Fallback symbols
+    const fallbackSymbols = {
+      'USD': '$', 'NGN': '₦'
+    };
+    return fallbackSymbols[currency] || '$';
+  }
+  
+  async function calculateFee() {
     const accountType = accountTypeSelect.value;
     const serviceType = serviceTypeSelect.value;
     const specificIndex = specificServiceSelect.value;
     const amount = parseFloat(amountInput.value) || 0;
-    const currency = currencySelect.value;
-    const currencySymbol = exchangeRates[currency] ? exchangeRates[currency].symbol : '$';
+    const selectedCurrency = currencySelect.value;
+    const currencySymbol = getCurrencySymbol(selectedCurrency);
     const feeOption = document.querySelector('input[name="feeOption"]:checked').value;
     
     convertCurrency();
     
+    // Validation checks
     if (!serviceType) {
-      feeResult.innerHTML = '<span>Please select a service type first</span>';
-      networkFeeEl.textContent = `${currencySymbol}0.00`;
-      platformFeeEl.textContent = 'Select Service';
-      totalFeeEl.textContent = `${currencySymbol}0.00`;
-      document.getElementById('totalLabel').textContent = 'You Pay/Receive';
+      resetFeeDisplay('Select Service', currencySymbol);
       return;
     }
     
     if (specificIndex === '') {
-      feeResult.innerHTML = '<span>Please select a specific fee</span>';
-      networkFeeEl.textContent = `${currencySymbol}0.00`;
-      platformFeeEl.textContent = 'Select Specific Fee';
-      totalFeeEl.textContent = `${currencySymbol}0.00`;
-      document.getElementById('totalLabel').textContent = 'You Pay/Receive';
+      resetFeeDisplay('Select Specific Fee', currencySymbol);
       return;
     }
     
     if (amount <= 0) {
-      feeResult.innerHTML = '<span>Please enter an amount greater than 0</span>';
-      networkFeeEl.textContent = `${currencySymbol}0.00`;
-      platformFeeEl.textContent = 'Enter Amount';
-      totalFeeEl.textContent = `${currencySymbol}0.00`;
-      document.getElementById('totalLabel').textContent = 'You Pay/Receive';
+      resetFeeDisplay('Enter Amount', currencySymbol);
       return;
     }
     
     const service = feeData[accountType][serviceType][specificIndex];
     const feeStr = service.Fee;
     
-    console.log('Calculating fee for:', {
-      accountType,
-      serviceType,
-      specificIndex,
-      service,
-      feeStr,
-      amount,
-      currency,
-      feeOption
-    });
-    
-    let calculatedFee = 0;
+    let calculatedFeeInSelectedCurrency = 0;
     let feeDisplay = feeStr;
-    let baseAmount = amount; // Amount in selected currency
-    let finalAmount = amount; // Amount for calculation
     
+    // Parse and calculate fee
     if (feeStr === 'FREE') {
-      calculatedFee = 0;
+      calculatedFeeInSelectedCurrency = 0;
       feeDisplay = 'FREE';
     } else if (feeStr.includes('%')) {
       // Handle percentage fees
@@ -4688,81 +4712,77 @@ function setupCalculator() {
         const percentage = parseFloat(percentMatch[1]) / 100;
         
         if (feeOption === 'include') {
-          // If amount includes fees, calculate base amount first
-          baseAmount = amount / (1 + percentage);
-          calculatedFee = amount - baseAmount;
+          calculatedFeeInSelectedCurrency = (amount * percentage) / (1 + percentage);
         } else {
-          // If amount excludes fees, calculate fee on the amount
-          calculatedFee = amount * percentage;
+          calculatedFeeInSelectedCurrency = amount * percentage;
         }
         
-        // Handle capped fees like "2% ($1–$2)"
+        // Handle capped fees
         if (feeStr.includes('($')) {
-          const capMatch = feeStr.match(/\(\$([\d.]+)–\$([\d.]+)\)/);
+          const capMatch = feeStr.match(/\(\$([\d.]+)–\$([\d.]+)\)/) || feeStr.match(/\(\$([\d.]+) – \$([\d.]+)\)/);
           if (capMatch) {
-            const minCap = parseFloat(capMatch[1]);
-            const maxCap = parseFloat(capMatch[2]);
+            const minCapUSD = parseFloat(capMatch[1]);
+            const maxCapUSD = parseFloat(capMatch[2]);
+            
             // Convert caps to selected currency
-            const minCapConverted = currency !== 'USD' && exchangeRates[currency] ? minCap * exchangeRates[currency].rate : minCap;
-            const maxCapConverted = currency !== 'USD' && exchangeRates[currency] ? maxCap * exchangeRates[currency].rate : maxCap;
-            calculatedFee = Math.max(minCapConverted, Math.min(maxCapConverted, calculatedFee));
+            const minCapConverted = await convertCurrencyAmount(minCapUSD, 'USD', selectedCurrency);
+            const maxCapConverted = await convertCurrencyAmount(maxCapUSD, 'USD', selectedCurrency);
+            
+            calculatedFeeInSelectedCurrency = Math.max(minCapConverted, Math.min(maxCapConverted, calculatedFeeInSelectedCurrency));
           }
         }
         
-        // Handle range fees like "1.5% ($1 – $5)"
-        if (feeStr.includes('($') && feeStr.includes(' – $')) {
-          const rangeMatch = feeStr.match(/\(\$([\d.]+) – \$([\d.]+)\)/);
-          if (rangeMatch) {
-            const minFee = parseFloat(rangeMatch[1]);
-            const maxFee = parseFloat(rangeMatch[2]);
-            // Convert to selected currency
-            const minFeeConverted = currency !== 'USD' && exchangeRates[currency] ? minFee * exchangeRates[currency].rate : minFee;
-            const maxFeeConverted = currency !== 'USD' && exchangeRates[currency] ? maxFee * exchangeRates[currency].rate : maxFee;
-            calculatedFee = Math.max(minFeeConverted, Math.min(maxFeeConverted, calculatedFee));
-          }
-        }
-        
-        feeDisplay = `${percentMatch[1]}% = ${currencySymbol}${calculatedFee.toFixed(2)}`;
+        feeDisplay = `${percentMatch[1]}% = ${currencySymbol}${calculatedFeeInSelectedCurrency.toFixed(2)}`;
       }
     } else {
-      // Handle fixed fees
+      // Handle fixed fees (USD or NGN)
       const dollarMatch = feeStr.match(/\$([\d.]+)/);
       const nairaMatch = feeStr.match(/₦([\d,]+)/);
       
       if (dollarMatch) {
-        const baseFee = parseFloat(dollarMatch[1]);
-        // Convert to selected currency
-        calculatedFee = currency !== 'USD' && exchangeRates[currency] ? baseFee * exchangeRates[currency].rate : baseFee;
-        feeDisplay = `$${baseFee} = ${currencySymbol}${calculatedFee.toFixed(2)}`;
-      } else if (nairaMatch) {
-        const baseFee = parseFloat(nairaMatch[1].replace(',', ''));
-        if (currency === 'NGN') {
-          calculatedFee = baseFee;
+        const feeInUSD = parseFloat(dollarMatch[1]);
+        calculatedFeeInSelectedCurrency = await convertCurrencyAmount(feeInUSD, 'USD', selectedCurrency);
+        
+        if (selectedCurrency === 'USD') {
+          feeDisplay = `$${feeInUSD}`;
         } else {
-          // Convert NGN to USD first, then to target currency
-          const usdAmount = baseFee / (exchangeRates['NGN'] ? exchangeRates['NGN'].rate : 411);
-          calculatedFee = currency !== 'USD' && exchangeRates[currency] ? usdAmount * exchangeRates[currency].rate : usdAmount;
+          // Only show conversion if we got a valid rate from live API
+          if (calculatedFeeInSelectedCurrency > 0) {
+            feeDisplay = `$${feeInUSD} = ${currencySymbol}${calculatedFeeInSelectedCurrency.toFixed(2)}`;
+          } else {
+            feeDisplay = `$${feeInUSD} (Live rate unavailable)`;
+          }
         }
-        feeDisplay = `₦${baseFee.toLocaleString()} = ${currencySymbol}${calculatedFee.toFixed(2)}`;
-      }
-      
-      if (feeOption === 'include') {
-        // If amount includes fees, subtract fee from amount
-        baseAmount = amount - calculatedFee;
+      } else if (nairaMatch) {
+        const feeInNGN = parseFloat(nairaMatch[1].replace(',', ''));
+        calculatedFeeInSelectedCurrency = await convertCurrencyAmount(feeInNGN, 'NGN', selectedCurrency);
+        
+        if (selectedCurrency === 'NGN') {
+          feeDisplay = `₦${feeInNGN.toLocaleString()}`;
+        } else {
+          // Only show conversion if we got a valid rate from live API
+          if (calculatedFeeInSelectedCurrency > 0) {
+            feeDisplay = `₦${feeInNGN.toLocaleString()} = ${currencySymbol}${calculatedFeeInSelectedCurrency.toFixed(2)}`;
+          } else {
+            feeDisplay = `₦${feeInNGN.toLocaleString()} (Live rate unavailable)`;
+          }
+        }
       }
     }
     
-    // Calculate final amounts and set label
-    const totalLabelEl = document.getElementById('totalLabel');
+    // Calculate final amounts
     let youPayReceive;
+    const totalLabelEl = document.getElementById('totalLabel');
+    
     if (feeOption === 'include') {
-      youPayReceive = baseAmount; // You receive this amount (fees already deducted from input)
+      youPayReceive = amount - calculatedFeeInSelectedCurrency;
       totalLabelEl.textContent = 'You Receive';
     } else {
-      youPayReceive = amount + calculatedFee; // You pay total (amount + fees)
+      youPayReceive = amount + calculatedFeeInSelectedCurrency;
       totalLabelEl.textContent = 'You Pay';
     }
     
+    // Update display
     feeResult.innerHTML = `
       <div style="display: flex; align-items: center; gap: 1rem; justify-content: center;">
         <i class="fas fa-calculator"></i>
@@ -4771,11 +4791,19 @@ function setupCalculator() {
     `;
     feeResult.classList.add('active');
     
-    networkFeeEl.textContent = feeStr === 'FREE' ? 'FREE' : `${currencySymbol}${calculatedFee.toFixed(2)}`;
+    networkFeeEl.textContent = feeStr === 'FREE' ? 'FREE' : `${currencySymbol}${calculatedFeeInSelectedCurrency.toFixed(2)}`;
     platformFeeEl.textContent = service.Service;
     totalFeeEl.textContent = `${currencySymbol}${youPayReceive.toFixed(2)}`;
     
     setTimeout(() => feeResult.classList.remove('active'), 500);
+  }
+  
+  function resetFeeDisplay(message, currencySymbol) {
+    feeResult.innerHTML = `<span>Please ${message.toLowerCase()}</span>`;
+    networkFeeEl.textContent = `${currencySymbol}0.00`;
+    platformFeeEl.textContent = message;
+    totalFeeEl.textContent = `${currencySymbol}0.00`;
+    document.getElementById('totalLabel').textContent = 'You Pay/Receive';
   }
   
   accountTypeSelect.addEventListener('change', populateServiceTypes);
@@ -5190,33 +5218,48 @@ function setupFloatingMenu() {
   }
 }
 
+// Generate and download fee guide
+function generateFeeGuide() {
+  const csvContent = [
+    ['Account Type', 'Service Category', 'Service', 'Fee', 'Description'],
+    ...Object.entries(feeData).flatMap(([accountType, categories]) =>
+      Object.entries(categories).flatMap(([category, services]) =>
+        services.map(service => [
+          accountType,
+          category,
+          service.Service,
+          service.Fee,
+          service.Description || ''
+        ])
+      )
+    )
+  ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+  
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'VitalSwap_Fee_Guide.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // Floating action menu handler
 async function handleFloatingAction(action) {
   try {
-    const response = await fetch('/api/actions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        action,
-        data: { services: ['Freedom Virtual Card', 'FX Trading'] }
-      })
-    });
-    
-    const result = await response.json();
-    
-    if (result.success) {
-      switch (action) {
-        case 'save-favorites':
-          showToast('Favorites saved successfully!', 'success');
-          break;
-        case 'share-comparison':
-          navigator.clipboard.writeText(result.shareUrl);
-          showToast('Share link copied to clipboard!', 'success');
-          break;
-        case 'download-guide':
-          showToast('Fee guide download started!', 'success');
-          break;
-      }
+    switch (action) {
+      case 'save-favorites':
+        showToast('Favorites saved successfully!', 'success');
+        break;
+      case 'share-comparison':
+        const shareUrl = window.location.href;
+        navigator.clipboard.writeText(shareUrl);
+        showToast('Share link copied to clipboard!', 'success');
+        break;
+      case 'download-guide':
+        generateFeeGuide();
+        showToast('Fee guide downloaded!', 'success');
+        break;
     }
   } catch (error) {
     showToast('Action failed. Please try again.', 'error');
