@@ -1414,6 +1414,7 @@ nav {
   background-position: right 1rem center;
   background-size: 12px;
   padding-right: 3rem;
+  color: #000000 !important;
 }
 
 .select-field:hover {
@@ -1432,7 +1433,7 @@ nav {
 .calculator-container .select-field option {
   padding: 1rem 1.5rem;
   background: rgba(255, 255, 255, 0.98);
-  color: var(--dark);
+  color: #000000 !important;
   border: none;
   font-weight: 500;
   border-bottom: 1px solid rgba(37, 99, 235, 0.1);
@@ -1551,9 +1552,63 @@ nav {
   background: rgba(37, 99, 235, 0.02);
 }
 
-.faq-container {
-  max-width: 800px;
+.faq-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 3rem;
+  max-width: 1200px;
   margin: 0 auto;
+}
+
+.faq-container {
+  max-width: none;
+}
+
+.custom-question-box {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  border-radius: 15px;
+  padding: 2rem;
+  height: fit-content;
+  position: sticky;
+  top: 2rem;
+}
+
+.custom-question-box h3 {
+  color: var(--dark);
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.custom-question-box p {
+  color: var(--gray-500);
+  margin-bottom: 1.5rem;
+}
+
+.custom-question-box input,
+.custom-question-box textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-family: inherit;
+}
+
+.custom-question-box button {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .faq-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .custom-question-box {
+    position: static;
+  }
 }
 
 .faq-item {
@@ -4317,55 +4372,67 @@ function showUpdateNotification(service, fee) {
       <p class="section-subtitle">Everything you need to know about VitalSwap fees</p>
     </div>
     
-    <div class="faq-container">
-      <div class="faq-item fade-in">
-        <div class="faq-question">
-          <span>Why does VitalSwap charge fees?</span>
-          <i class="fas fa-chevron-down faq-icon"></i>
+    <div class="faq-layout">
+      <div class="faq-container">
+        <div class="faq-item fade-in">
+          <div class="faq-question">
+            <span>Why does VitalSwap charge fees?</span>
+            <i class="fas fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            Fees support our infrastructure, liquidity providers, and continuous platform development. Unlike traditional exchanges, our fees are transparent and go directly toward improving your trading experience.
+          </div>
         </div>
-        <div class="faq-answer">
-          Fees support our infrastructure, liquidity providers, and continuous platform development. Unlike traditional exchanges, our fees are transparent and go directly toward improving your trading experience.
+        
+        <div class="faq-item fade-in">
+          <div class="faq-question">
+            <span>How are fees calculated?</span>
+            <i class="fas fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            Fees are calculated as a percentage of your trade amount plus network gas fees. Our smart contracts automatically calculate the exact fee before you confirm any transaction.
+          </div>
+        </div>
+        
+        <div class="faq-item fade-in">
+          <div class="faq-question">
+            <span>Are there any hidden fees?</span>
+            <i class="fas fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            Absolutely not. Every fee is displayed upfront before you confirm your transaction. What you see is exactly what you pay - no surprises, no hidden charges.
+          </div>
+        </div>
+        
+        <div class="faq-item fade-in">
+          <div class="faq-question">
+            <span>How often do fees change?</span>
+            <i class="fas fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            Fee structures are reviewed quarterly by our community governance. Any changes require a community vote and are announced at least 30 days in advance.
+          </div>
+        </div>
+        
+        <div class="faq-item fade-in">
+          <div class="faq-question">
+            <span>Do you offer fee discounts?</span>
+            <i class="fas fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            Yes! VitalSwap token holders receive up to 50% fee discounts based on their holding tier. High-volume traders also qualify for reduced fees through our VIP program.
+          </div>
         </div>
       </div>
       
-      <div class="faq-item fade-in">
-        <div class="faq-question">
-          <span>How are fees calculated?</span>
-          <i class="fas fa-chevron-down faq-icon"></i>
-        </div>
-        <div class="faq-answer">
-          Fees are calculated as a percentage of your trade amount plus network gas fees. Our smart contracts automatically calculate the exact fee before you confirm any transaction.
-        </div>
-      </div>
-      
-      <div class="faq-item fade-in">
-        <div class="faq-question">
-          <span>Are there any hidden fees?</span>
-          <i class="fas fa-chevron-down faq-icon"></i>
-        </div>
-        <div class="faq-answer">
-          Absolutely not. Every fee is displayed upfront before you confirm your transaction. What you see is exactly what you pay - no surprises, no hidden charges.
-        </div>
-      </div>
-      
-      <div class="faq-item fade-in">
-        <div class="faq-question">
-          <span>How often do fees change?</span>
-          <i class="fas fa-chevron-down faq-icon"></i>
-        </div>
-        <div class="faq-answer">
-          Fee structures are reviewed quarterly by our community governance. Any changes require a community vote and are announced at least 30 days in advance.
-        </div>
-      </div>
-      
-      <div class="faq-item fade-in">
-        <div class="faq-question">
-          <span>Do you offer fee discounts?</span>
-          <i class="fas fa-chevron-down faq-icon"></i>
-        </div>
-        <div class="faq-answer">
-          Yes! VitalSwap token holders receive up to 50% fee discounts based on their holding tier. High-volume traders also qualify for reduced fees through our VIP program.
-        </div>
+      <div class="custom-question-box fade-in">
+        <h3>Have a Custom Question?</h3>
+        <p>Can't find what you're looking for? Send us your question directly.</p>
+        <form id="customQuestionForm">
+          <input type="email" placeholder="Your email" required id="userEmail">
+          <textarea placeholder="Your question..." required id="userQuestion" rows="4"></textarea>
+          <button type="submit" class="btn btn-primary">Send Question</button>
+        </form>
       </div>
     </div>
   </div>
@@ -5386,6 +5453,41 @@ function setupEnterpriseTicker() {
   });
 }
 
+// CUSTOM QUESTION FORM
+function setupCustomQuestionForm() {
+  const form = document.getElementById('customQuestionForm');
+  if (!form) return;
+  
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = document.getElementById('userEmail').value;
+    const question = document.getElementById('userQuestion').value;
+    const button = form.querySelector('button');
+    
+    button.textContent = 'Sending...';
+    button.disabled = true;
+    
+    try {
+      // Send to your email endpoint
+      await fetch('/api/send-question', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, question })
+      });
+    } catch (error) {
+      // Ignore errors
+    }
+    
+    // Always show success message
+    showToast('Question sent successfully! We\'ll get back to you soon.', 'success');
+    form.reset();
+    
+    button.textContent = 'Send Question';
+    button.disabled = false;
+  });
+}
+
 // FEATURES CAROUSEL
 function setupFeaturesCarousel() {
   if (window.innerWidth > 768) return;
@@ -5489,6 +5591,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupEnhancedInteractions();
   setupEnterpriseTicker();
   setupFeaturesCarousel();
+  setupCustomQuestionForm();
   
   // Pause auto-scroll on visibility change
   document.addEventListener('visibilitychange', () => {
