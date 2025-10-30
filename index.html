@@ -1094,7 +1094,7 @@ nav {
 
 .floating-card-3 {
   bottom: 20%;
-  left: 15%;
+  left: 5%;
   animation-delay: 4s;
 }
 
@@ -2458,6 +2458,10 @@ body.dark-mode .service-item {
   border: 1px solid rgba(37, 99, 235, 0.2);
 }
 
+body.dark-mode .currency-info {
+  background: rgba(37, 99, 235, 0.1);
+}
+
 body.dark-mode .currency-converter {
   background: rgba(37, 99, 235, 0.1);
   border: 1px solid rgba(37, 99, 235, 0.3);
@@ -2934,6 +2938,8 @@ body.dark-mode .business-fee {
   opacity: 1;
   transform: translateX(0);
 }
+
+
 </style>
 </head>
 <body>
@@ -3079,9 +3085,11 @@ body.dark-mode .business-fee {
   
   <!-- Side-by-Side Comparison Table -->
   <div class="comparison-table">
-    <div class="table-header">
-      <h3>Customer vs Business Account Comparison</h3>
-      <p>Key differences in pricing between account types</p>
+    <div class="table-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h3>Customer vs Business Account Comparison</h3>
+        <p style="font-size: small; text-align: start;">Key differences in pricing between account types</p>
+      </div>
       <input type="text" id="feeSearch" placeholder="Search fees..." class="fee-search">
     </div>
     <div class="table-content" id="comparisonTable">
@@ -3752,7 +3760,7 @@ function setupFeeSearch() {
 <footer>
   <div class="footer-content">
     <div class="footer-section">
-      <h3>VitalSwap</h3>
+      <img src="https://images.vitalswap.com/pay-with-vitalswap/1.png" alt="VitalSwap" class="preloader-logo">
       <p style="color: var(--gray-400); margin-bottom: 1rem;">The future of transparent decentralized trading.</p>
       <div style="display: flex; gap: 1rem; justify-content: center;">
         <a href="#" style="color: var(--secondary); font-size: 1.2rem;"><i class="fab fa-twitter"></i></a>
@@ -3788,7 +3796,7 @@ function setupFeeSearch() {
   </div>
   
   <div class="footer-bottom">
-    <p>&copy; 2025 VitalSwap. All rights reserved. Built with ❤️ for the DeFi community.</p>
+    <p>&copy; 2025 VitalSwap. All rights reserved. Algonauts.</p>
   </div>
 </footer>
 
