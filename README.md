@@ -17,8 +17,14 @@ VitalSwap is a next-generation financial platform that provides:
 - **Real-Time Fee Updates**: Auto-sync every 5 minutes from backend
 - **Dynamic Pricing Engine**: Market-based adjustments based on volume/demand
 - **Comprehensive Comparison**: Customer vs Business account fee structures
-- **Multi-Currency Support**: USD, EUR, GBP, JPY, CAD, AUD, CHF, CNY, NGN
+- **Live API Integration**: Exclusive use of VitalSwap's exchange API
+- **Currency Support**: USD and NGN with accurate symbol display
 - **Interactive Calculator**: Live fee calculation with currency conversion
+- **Mobile Optimized**: Wider layout with larger input fields
+- **Accessibility Compliant**: WCAG 2.1 AA standards with screen reader support
+- **Input Validation**: Real-time validation with visual feedback
+- **Loading States**: Skeleton loaders during API calls
+- **Error Recovery**: Comprehensive error handling with user guidance
 
 ### 🏦 Virtual Banking Booth
 - **Live Video Consultations**: Face-to-face meetings with banking specialists
@@ -52,8 +58,12 @@ VitalSwap is a next-generation financial platform that provides:
 ### 🎨 User Experience
 - **Mobile-First Design**: Bottom sheet modals with swipe gestures
 - **Dark/Light Mode**: Automatic theme switching
-- **Accessibility**: Screen reader support and keyboard navigation
+- **Accessibility**: Full screen reader support, keyboard navigation, ARIA labels
 - **Progressive Web App**: Offline capabilities and app-like experience
+- **Loading States**: Skeleton loaders and visual feedback
+- **Input Validation**: Real-time validation with error messages
+- **Autocomplete**: Recent calculations saving and suggestions
+- **Error Handling**: Comprehensive error states with recovery options
 
 ## 🛠️ Technical Architecture
 
@@ -103,6 +113,11 @@ FIREBASE_PRIVATE_KEY=your-firebase-private-key
 # AI Integration
 GOOGLE_AI_API_KEY=your-google-ai-api-key
 ```
+
+### API Endpoints
+- **Exchange Rate API**: `https://2kbbumlxz3.execute-api.us-east-1.amazonaws.com/default/exchange`
+- **Fee Updates API**: `/api/fee-updates.js`
+- **Push Notifications**: `/api/notifications/`
 
 ### Installation & Deployment
 
@@ -166,12 +181,15 @@ GOOGLE_AI_API_KEY=your-google-ai-api-key
 - **HTTPS Only**: Secure data transmission
 - **No Data Storage**: Video/audio streams not stored
 - **Access Control**: Session-based authentication
+- **Input Sanitization**: XSS protection and data validation
 
 ### Compliance Standards
 - **GDPR Ready**: Minimal data collection with user consent
 - **CCPA Compliant**: Transparent data usage policies
 - **Banking Standards**: Financial industry security requirements
 - **SOC 2 Type II**: Security controls and operational effectiveness
+- **WCAG 2.1 AA**: Web accessibility compliance
+- **Section 508**: Government accessibility standards
 
 ## 📱 Mobile Optimization
 
@@ -180,12 +198,16 @@ GOOGLE_AI_API_KEY=your-google-ai-api-key
 - **Swipe Gestures**: Intuitive touch interactions
 - **Touch-Friendly Controls**: Optimized button sizes
 - **Adaptive Layouts**: Screen size optimization
+- **Wider Calculator**: Enhanced mobile layout with larger inputs
+- **Vertical Layout**: Stack elements for better mobile UX
 
 ### Performance
 - **Lazy Loading**: Components loaded on demand
 - **Image Optimization**: WebP format with fallbacks
 - **Caching Strategy**: Efficient resource management
 - **Offline Support**: Service worker implementation
+- **Skeleton Loading**: Visual feedback during API calls
+- **Error Recovery**: Graceful handling of network issues
 
 ## 🤝 Integration Capabilities
 
@@ -246,12 +268,20 @@ The platform seamlessly integrates with the Virtual Banking Booth system:
 - **Integration Guides**: Step-by-step implementation guides
 - **Troubleshooting**: Common issues and solutions
 - **Performance Optimization**: Best practices and tips
+- **Accessibility Testing**: Screen reader and keyboard navigation guides
 
 ### Customer Support
 - **Live Chat**: AI-powered instant support
 - **Video Consultations**: Face-to-face assistance via Virtual Booth
 - **Knowledge Base**: Extensive FAQ and tutorials
 - **Community Forum**: User community and discussions
+- **Custom Questions**: Email form for specific inquiries
+
+### Accessibility Testing
+- **Screen Reader Testing**: NVDA, JAWS, VoiceOver compatibility
+- **Keyboard Navigation**: Tab order and focus management
+- **Color Contrast**: WCAG AA compliance verification
+- **Voice Commands**: Browser voice input support
 
 ## 📄 License
 
