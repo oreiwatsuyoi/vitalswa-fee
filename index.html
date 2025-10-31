@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>VitalSwap | Transparent Fees</title>
 
+<!-- PWA Manifest -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2563eb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="VitalSwap">
+<link rel="apple-touch-icon" href="https://images.vitalswap.com/pay-with-vitalswap/1.png">
+
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -1430,6 +1438,11 @@ nav {
   background-color: rgba(255, 255, 255, 1);
 }
 
+.select-field:focus:not(:focus-visible) {
+  border-color: rgba(37, 99, 235, 0.2);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.08);
+}
+
 .calculator-container .select-field option {
   padding: 1rem 1.5rem;
   background: rgba(255, 255, 255, 0.98);
@@ -1511,6 +1524,11 @@ nav {
   background-color: rgba(255, 255, 255, 1);
 }
 
+.input-field:focus:not(:focus-visible) {
+  border-color: rgba(37, 99, 235, 0.2);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.08);
+}
+
 .input-field:hover {
   border-color: var(--primary);
   background-color: rgba(255, 255, 255, 1);
@@ -1565,7 +1583,7 @@ nav {
 }
 
 .custom-question-box {
-  background: var(--light);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(37, 99, 235, 0.1);
   border-radius: 15px;
@@ -1594,7 +1612,6 @@ nav {
   border-radius: 8px;
   margin-bottom: 1rem;
   font-family: inherit;
-  background: var(--light);
 }
 
 .custom-question-box button {
@@ -1636,6 +1653,17 @@ nav {
   font-weight: 600;
   transition: all 0.3s ease;
   color: var(--dark);
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.faq-question:focus:not(:focus-visible) {
+  outline: none;
+  background: rgba(37, 99, 235, 0.05);
 }
 
 .faq-question:hover {
@@ -1649,7 +1677,6 @@ nav {
   max-height: 0;
   overflow: hidden;
   transition: all 0.3s ease;
-  margin-bottom : 10px;
 }
 
 .faq-item.active .faq-answer {
@@ -1704,6 +1731,138 @@ footer {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 2rem;
   color: var(--gray-400);
+}
+
+/* SKELETON LOADERS */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ERROR STATES */
+.error-message {
+  color: var(--danger);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: slideInError 0.3s ease;
+}
+
+.input-error {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+  animation: shakeError 0.5s ease;
+}
+
+/* VISUAL FEEDBACK ANIMATIONS */
+@keyframes slideInError {
+  0% { opacity: 0; transform: translateY(-10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.fee-updated {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  color: white !important;
+  animation: pulseSuccess 1s ease;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+@keyframes pulseSuccess {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+}
+
+.value-change {
+  animation: highlightChange 2s ease;
+}
+
+@keyframes highlightChange {
+  0% { background: rgba(37, 99, 235, 0.2); }
+  50% { background: rgba(37, 99, 235, 0.4); }
+  100% { background: transparent; }
+}
+
+/* ACCESSIBILITY */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sr-only-focusable:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0.5rem 1rem;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  background: var(--primary);
+  color: white;
+  text-decoration: none;
+  z-index: 10000;
+  display: block;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Remove all visible borders and outlines */
+fieldset {
+  border: none !important;
+  padding: 0;
+  margin: 0;
+}
+
+legend {
+  border: none !important;
+  padding: 0;
+}
+
+form {
+  border: none !important;
+}
+
+/* Only show focus indicators for keyboard navigation */
+.js-focus-visible :focus:not(.focus-visible) {
+  outline: none !important;
+}
+
+.focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Remove all default focus styles */
+:focus {
+  outline: none !important;
+}
+
+/* Only show focus for keyboard users */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 /* MOBILE RESPONSIVENESS */
@@ -2014,7 +2173,7 @@ footer {
 }
 
 .modal-content {
-  background: var(--light);
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(20px);
   border-radius: 25px;
   padding: 2.5rem;
@@ -3269,12 +3428,21 @@ body.dark-mode .business-fee {
 </style>
 </head>
 <body>
+<!-- Screen Reader Skip Links -->
+<a href="#main-content" class="sr-only sr-only-focusable">Skip to main content</a>
+<a href="#calculator" class="sr-only sr-only-focusable">Skip to fee calculator</a>
+<a href="#navigation" class="sr-only sr-only-focusable">Skip to navigation</a>
+
+<!-- Live Region for Screen Reader Announcements -->
+<div id="sr-announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+<div id="sr-alerts" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
+
 <!-- PRELOADER -->
-<div class="preloader" id="preloader">
+<div class="preloader" id="preloader" aria-hidden="true">
   <div class="preloader-content">
-    <img src="https://images.vitalswap.com/pay-with-vitalswap/1.png" alt="VitalSwap" class="preloader-logo">
+    <img src="https://images.vitalswap.com/pay-with-vitalswap/1.png" alt="VitalSwap logo" class="preloader-logo">
     <div class="preloader-text">VitalSwap</div>
-    <div class="loading-bar"><div class="loading-progress"></div></div>
+    <div class="loading-bar" role="progressbar" aria-label="Loading VitalSwap application"><div class="loading-progress"></div></div>
   </div>
 </div>
 
@@ -3338,20 +3506,23 @@ body.dark-mode .business-fee {
 <!-- LASER LIGHTS -->
 <div class="laser-container" id="lasers"></div>
 
+<!-- Main Content -->
+<main id="main-content" role="main">
+
 <!-- VitalSwap Services Section -->
-<section class="hero" id="home" style="padding-top: 120px;">
+<section class="hero" id="home" style="padding-top: 120px;" role="banner" aria-labelledby="main-heading">
   <div class="hero-content">
     <div class="unified-card fade-in">
-      <div class="card-icons">
-        <div class="card-icon fee-icon">
-          <i class="fas fa-calculator"></i>
+      <div class="card-icons" role="presentation">
+        <div class="card-icon fee-icon" role="presentation">
+          <i class="fas fa-calculator" aria-hidden="true"></i>
         </div>
-        <div class="card-icon booth-icon">
-          <i class="fas fa-video"></i>
+        <div class="card-icon booth-icon" role="presentation">
+          <i class="fas fa-video" aria-hidden="true"></i>
         </div>
       </div>
       
-      <h1>VitalSwap Services</h1>
+      <h1 id="main-heading">VitalSwap Services</h1>
       <p>Experience transparent fees and connect with banking agents through our comprehensive platform</p>
       
       <div class="hero-badge">
@@ -3500,6 +3671,30 @@ body.dark-mode .business-fee {
 // Global variables for live data
 let feeData = {};
 let exchangeRates = {};
+
+// Screen Reader Announcement Functions
+function announceToScreenReader(message, priority = 'polite') {
+  const announcer = document.getElementById(priority === 'assertive' ? 'sr-alerts' : 'sr-announcements');
+  if (announcer) {
+    announcer.textContent = message;
+    setTimeout(() => {
+      announcer.textContent = '';
+    }, 1000);
+  }
+}
+
+function announceCalculationResult(service, fee, total, currency) {
+  const message = `Fee calculated for ${service}. Fee amount: ${fee}. Total: ${total} ${currency}.`;
+  announceToScreenReader(message, 'polite');
+}
+
+function announceError(error) {
+  announceToScreenReader(`Error: ${error}`, 'assertive');
+}
+
+function announceLoading(message) {
+  announceToScreenReader(message, 'polite');
+}
 
 // API Functions
 async function fetchFeeData() {
@@ -4166,34 +4361,33 @@ function showUpdateNotification(service, fee) {
 <div class="laser-container" id="lasers"></div>
 
 <!-- NAVIGATION -->
-<div class="nav-container" id="nav">
-  <nav>
+<header class="nav-container" id="navigation" role="banner">
+  <nav role="navigation" aria-label="Main navigation">
     <div class="nav-content">
       <div style="display: flex; align-items: center; gap: 1rem;">
         <div class="logo">
-          <img src="https://images.vitalswap.com/pay-with-vitalswap/1.png" alt="VitalSwap Logo">
+          <img src="https://images.vitalswap.com/pay-with-vitalswap/1.png" alt="VitalSwap company logo">
           VitalSwap
         </div>
-
       </div>
       <div class="nav-right">
-        <div class="account-balance desktop-balance">
-          <i class="fas fa-wallet"></i>
+        <div class="account-balance desktop-balance" role="status" aria-label="Account balance">
+          <i class="fas fa-wallet" aria-hidden="true"></i>
           <span>$0.00</span>
         </div>
-        <ul class="nav-links">
-          <li><a href="#calculator">Fee Calculator</a></li>
-          <li><a href="#comparison">Comparison</a></li>
-          <li><a href="#faq">FAQ</a></li>
-          <li><a href="#contact">Contact Us</a></li>
-          <li><a href="my-webrtc-app/public/index.html" class="nav-booth-link">
-            <i class="fas fa-video"></i> Virtual Booth
+        <ul class="nav-links" role="menubar">
+          <li role="none"><a href="#calculator" role="menuitem">Fee Calculator</a></li>
+          <li role="none"><a href="#fees" role="menuitem">Fee Comparison</a></li>
+          <li role="none"><a href="#faq" role="menuitem">FAQ</a></li>
+          <li role="none"><a href="#contact" role="menuitem">Contact Us</a></li>
+          <li role="none"><a href="my-webrtc-app/public/index.html" class="nav-booth-link" role="menuitem">
+            <i class="fas fa-video" aria-hidden="true"></i> Virtual Booth
           </a></li>
         </ul>
       </div>
     </div>
   </nav>
-</div>
+</header>
 
 <!-- MOBILE NAVIGATION -->
 <div class="mobile-nav">
@@ -4224,84 +4418,118 @@ function showUpdateNotification(service, fee) {
 
 
 <!-- FEE CALCULATOR -->
-<section class="calculator" id="calculator">
+<section class="calculator" id="calculator" role="region" aria-labelledby="calculator-heading">
   <div class="container">
     <div class="calculator-container fade-in">
-      <h2 class="calculator-title">Fee Calculator</h2>
+      <h2 id="calculator-heading" class="calculator-title">Fee Calculator</h2>
       <p class="calculator-subtitle">Calculate fees for any VitalSwap service</p>
       
-      <div class="calculator-grid">
-        <div class="input-group">
-          <select class="select-field" id="accountType">
-            <option value="Customer">Customer Account</option>
-            <option value="Business">Business Account</option>
-          </select>
-        </div>
-        <div class="input-group">
-          <select class="select-field" id="serviceType">
-            <option value="">Select Service</option>
-          </select>
-        </div>
-      </div>
+      <form role="form" aria-label="Fee calculation form">
+        <fieldset>
+          <legend class="sr-only">Account and Service Selection</legend>
+          <div class="calculator-grid">
+            <div class="input-group">
+              <label for="accountType" class="sr-only">Account Type</label>
+              <select class="select-field" id="accountType" aria-label="Select your account type" aria-describedby="account-help" required>
+                <option value="Customer">Customer Account</option>
+                <option value="Business">Business Account</option>
+              </select>
+              <div id="account-help" class="sr-only">Choose between Customer or Business account for different fee structures</div>
+            </div>
+            <div class="input-group">
+              <label for="serviceType" class="sr-only">Service Type</label>
+              <select class="select-field" id="serviceType" aria-label="Select service type" aria-describedby="service-help" required>
+                <option value="">Select Service</option>
+              </select>
+              <div id="service-help" class="sr-only">Choose the VitalSwap service you want to calculate fees for</div>
+            </div>
+          </div>
+        </fieldset>
       
-      <div class="input-group">
-        <select class="select-field" id="specificService">
-          <option value="">Select Specific Fee</option>
-        </select>
-      </div>
+        <fieldset>
+          <legend class="sr-only">Specific Service and Amount</legend>
+          <div class="input-group">
+            <label for="specificService" class="sr-only">Specific Service</label>
+            <select class="select-field" id="specificService" aria-label="Select specific service to calculate fees for" aria-describedby="specific-help" required>
+              <option value="">Select Specific Fee</option>
+            </select>
+            <div id="specific-help" class="sr-only">Choose the exact service within your selected category</div>
+          </div>
+          
+          <div class="calculator-grid">
+            <div class="input-group">
+              <label for="tradeAmount" class="sr-only">Transaction Amount</label>
+              <input type="number" class="input-field" id="tradeAmount" placeholder="Enter amount" min="0" step="0.01" list="recentAmounts" aria-label="Enter transaction amount in numbers only" aria-describedby="amountError amount-help" required>
+              <datalist id="recentAmounts"></datalist>
+              <div id="amount-help" class="sr-only">Enter the amount you want to calculate fees for. Use numbers only, no currency symbols.</div>
+              <div class="error-message" id="amountError" style="display: none;" role="alert"></div>
+            </div>
+            <div class="input-group">
+              <label for="currency" class="sr-only">Currency</label>
+              <select class="select-field" id="currency" aria-label="Select currency for your transaction" aria-describedby="currency-help">
+                <option value="USD">USD - US Dollar</option>
+                <option value="NGN">NGN - Nigerian Naira</option>
+              </select>
+              <div id="currency-help" class="sr-only">Choose USD for US Dollars or NGN for Nigerian Naira</div>
+            </div>
+          </div>
+        </fieldset>
       
-      <div class="calculator-grid">
-        <div class="input-group">
-          <input type="number" class="input-field" id="tradeAmount" placeholder="Enter amount" min="0" step="0.01">
-        </div>
-        <div class="input-group">
-          <select class="select-field" id="currency">
-            <option value="USD">USD ($)</option>
-            <option value="NGN">NGN (₦)</option>
-          </select>
-        </div>
-      </div>
+        <fieldset>
+          <legend class="sr-only">Currency Conversion</legend>
+          <div class="currency-converter" id="currencyConverter" style="display: none;" role="region" aria-labelledby="converter-heading">
+            <h3 id="converter-heading" class="sr-only">Currency Conversion Result</h3>
+            <div class="converter-row">
+              <div class="converter-amount" id="convertedAmount" role="status" aria-live="polite" aria-label="Converted amount">0.00</div>
+              <label for="targetCurrency" class="sr-only">Target Currency for Conversion</label>
+              <select class="select-field" id="targetCurrency" aria-label="Select target currency for conversion" aria-describedby="target-help">
+                <option value="USD">USD - US Dollar</option>
+                <option value="NGN">NGN - Nigerian Naira</option>
+              </select>
+              <div id="target-help" class="sr-only">Choose the currency to convert your amount to</div>
+            </div>
+          </div>
+        </fieldset>
+        
+        <!-- Fee Inclusion Toggle -->
+        <fieldset style="margin: 1.5rem 0;">
+          <legend>Fee Calculation Method</legend>
+          <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; color: var(--dark);">
+              <input type="radio" name="feeOption" value="exclude" checked style="margin: 0;" aria-describedby="exclude-help">
+              <span>Amount excluding fees</span>
+              <div id="exclude-help" class="sr-only">Enter the amount you want to send or deposit. Fees will be added on top of this amount.</div>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; color: var(--dark);">
+              <input type="radio" name="feeOption" value="include" style="margin: 0;" aria-describedby="include-help">
+              <span>Amount including fees</span>
+              <div id="include-help" class="sr-only">Enter the total amount you're willing to pay. Fees will be deducted from this amount.</div>
+            </label>
+          </div>
+        </fieldset>
+      </form>
       
-      <div class="currency-converter" id="currencyConverter" style="display: none;">
-        <div class="converter-row">
-          <div class="converter-amount" id="convertedAmount">0.00</div>
-          <select class="select-field" id="targetCurrency">
-            <option value="USD">USD ($)</option>
-            <option value="NGN">NGN (₦)</option>
-          </select>
-        </div>
-      </div>
-      
-      <!-- Fee Inclusion Toggle -->
-      <div style="margin: 1.5rem 0; display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap;">
-        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; color: var(--dark);">
-          <input type="radio" name="feeOption" value="exclude" checked style="margin: 0;">
-          <span>Amount excluding fees <i class="fas fa-question-circle" style="font-size: 0.8rem; color: var(--primary); cursor: help;" title="Enter the amount you want to send/deposit. Fees will be added on top."></i></span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; color: var(--dark);">
-          <input type="radio" name="feeOption" value="include" style="margin: 0;">
-          <span>Amount including fees <i class="fas fa-question-circle" style="font-size: 0.8rem; color: var(--primary); cursor: help;" title="Enter the total amount you're willing to pay. Fees will be deducted from this amount."></i></span>
-        </label>
-      </div>
-      
-      <div class="result-display" id="feeResult">
+      <div class="result-display" id="feeResult" role="status" aria-live="polite" aria-label="Fee calculation result">
         <span>Enter amount to see fees</span>
       </div>
       
-      <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; text-align: center;">
-        <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 10px;">
-          <div style="font-size: 0.9rem; color: var(--gray-400);">Fee Amount</div>
-          <div style="font-weight: 700; color: var(--success);" id="networkFee">$0.00</div>
+      <section role="region" aria-labelledby="fee-breakdown-heading" style="margin-top: 2rem;">
+        <h3 id="fee-breakdown-heading" class="sr-only">Fee Calculation Breakdown</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; text-align: center;">
+          <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 10px;" role="group" aria-labelledby="fee-amount-label">
+            <div id="fee-amount-label" style="font-size: 0.9rem; color: var(--gray-400);">Fee Amount</div>
+            <div style="font-weight: 700; color: var(--success);" id="networkFee" role="status" aria-live="polite">$0.00</div>
+          </div>
+          <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 10px;" role="group" aria-labelledby="service-label">
+            <div id="service-label" style="font-size: 0.9rem; color: var(--gray-400);">Service</div>
+            <div style="font-weight: 700; color: var(--secondary); font-size: 0.8rem;" id="platformFee" role="status" aria-live="polite">Select Service</div>
+          </div>
+          <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 10px;" role="group" aria-labelledby="total-label">
+            <div style="font-size: 0.9rem; color: var(--gray-400);" id="totalLabel">You Pay/Receive</div>
+            <div style="font-weight: 700; color: var(--accent);" id="totalFee" role="status" aria-live="polite">$0.00</div>
+          </div>
         </div>
-        <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 10px;">
-          <div style="font-size: 0.9rem; color: var(--gray-400);">Service</div>
-          <div style="font-weight: 700; color: var(--secondary); font-size: 0.8rem;" id="platformFee">Select Service</div>
-        </div>
-        <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 10px;">
-          <div style="font-size: 0.9rem; color: var(--gray-400);" id="totalLabel">You Pay/Receive</div>
-          <div style="font-weight: 700; color: var(--accent);" id="totalFee">$0.00</div>
-        </div>
-      </div>
+      </section>
     </div>
   </div>
 </section>
@@ -4367,73 +4595,80 @@ function showUpdateNotification(service, fee) {
 </section>
 
 <!-- FAQ SECTION -->
-<section class="faq" id="faq">
+<section class="faq" id="faq" role="region" aria-labelledby="faq-heading">
   <div class="container">
     <div class="section-header fade-in">
-      <h2 class="section-title">Frequently Asked Questions</h2>
+      <h2 id="faq-heading" class="section-title">Frequently Asked Questions</h2>
       <p class="section-subtitle">Everything you need to know about VitalSwap fees</p>
     </div>
     
     <div class="faq-layout">
       <div class="faq-container">
         <div class="faq-item fade-in">
-          <div class="faq-question">
+          <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-1" id="faq-question-1">
             <span>Why does VitalSwap charge fees?</span>
-            <i class="fas fa-chevron-down faq-icon"></i>
-          </div>
-          <div class="faq-answer">
+            <i class="fas fa-chevron-down faq-icon" aria-hidden="true"></i>
+          </button>
+          <div class="faq-answer" id="faq-answer-1" aria-labelledby="faq-question-1" role="region">
             Fees support our infrastructure, liquidity providers, and continuous platform development. Unlike traditional exchanges, our fees are transparent and go directly toward improving your trading experience.
           </div>
         </div>
         
         <div class="faq-item fade-in">
-          <div class="faq-question">
+          <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-2" id="faq-question-2">
             <span>How are fees calculated?</span>
-            <i class="fas fa-chevron-down faq-icon"></i>
-          </div>
-          <div class="faq-answer">
+            <i class="fas fa-chevron-down faq-icon" aria-hidden="true"></i>
+          </button>
+          <div class="faq-answer" id="faq-answer-2" aria-labelledby="faq-question-2" role="region">
             Fees are calculated as a percentage of your trade amount plus network gas fees. Our smart contracts automatically calculate the exact fee before you confirm any transaction.
           </div>
         </div>
         
         <div class="faq-item fade-in">
-          <div class="faq-question">
+          <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-3" id="faq-question-3">
             <span>Are there any hidden fees?</span>
-            <i class="fas fa-chevron-down faq-icon"></i>
-          </div>
-          <div class="faq-answer">
+            <i class="fas fa-chevron-down faq-icon" aria-hidden="true"></i>
+          </button>
+          <div class="faq-answer" id="faq-answer-3" aria-labelledby="faq-question-3" role="region">
             Absolutely not. Every fee is displayed upfront before you confirm your transaction. What you see is exactly what you pay - no surprises, no hidden charges.
           </div>
         </div>
         
         <div class="faq-item fade-in">
-          <div class="faq-question">
+          <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-4" id="faq-question-4">
             <span>How often do fees change?</span>
-            <i class="fas fa-chevron-down faq-icon"></i>
-          </div>
-          <div class="faq-answer">
+            <i class="fas fa-chevron-down faq-icon" aria-hidden="true"></i>
+          </button>
+          <div class="faq-answer" id="faq-answer-4" aria-labelledby="faq-question-4" role="region">
             Fee structures are reviewed quarterly by our community governance. Any changes require a community vote and are announced at least 30 days in advance.
           </div>
         </div>
         
         <div class="faq-item fade-in">
-          <div class="faq-question">
+          <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-5" id="faq-question-5">
             <span>Do you offer fee discounts?</span>
-            <i class="fas fa-chevron-down faq-icon"></i>
-          </div>
-          <div class="faq-answer">
+            <i class="fas fa-chevron-down faq-icon" aria-hidden="true"></i>
+          </button>
+          <div class="faq-answer" id="faq-answer-5" aria-labelledby="faq-question-5" role="region">
             Yes! VitalSwap token holders receive up to 50% fee discounts based on their holding tier. High-volume traders also qualify for reduced fees through our VIP program.
           </div>
         </div>
       </div>
       
-      <div class="custom-question-box fade-in">
-        <h3>Have a Custom Question?</h3>
+      <div class="custom-question-box fade-in" role="complementary" aria-labelledby="custom-question-heading">
+        <h3 id="custom-question-heading">Have a Custom Question?</h3>
         <p>Can't find what you're looking for? Send us your question directly.</p>
-        <form id="customQuestionForm">
-          <input type="email" placeholder="Your email" required id="userEmail">
-          <textarea placeholder="Your question..." required id="userQuestion" rows="4"></textarea>
-          <button type="submit" class="btn btn-primary">Send Question</button>
+        <form id="customQuestionForm" role="form" aria-label="Submit custom question">
+          <label for="userEmail" class="sr-only">Your Email Address</label>
+          <input type="email" placeholder="Your email" required id="userEmail" aria-label="Enter your email address for response" aria-describedby="email-help">
+          <div id="email-help" class="sr-only">We'll use this email to send you a response to your question</div>
+          
+          <label for="userQuestion" class="sr-only">Your Question</label>
+          <textarea placeholder="Your question..." required id="userQuestion" rows="4" aria-label="Enter your question about VitalSwap fees or services" aria-describedby="question-help"></textarea>
+          <div id="question-help" class="sr-only">Ask anything about VitalSwap fees, services, or how our platform works</div>
+          
+          <button type="submit" class="btn btn-primary" aria-describedby="submit-help">Send Question</button>
+          <div id="submit-help" class="sr-only">Submit your question and we'll respond via email within 24 hours</div>
         </form>
       </div>
     </div>
@@ -4526,18 +4761,20 @@ function showUpdateNotification(service, fee) {
   </div>
 </section>
 
+</main>
+
 <!-- FOOTER -->
-<footer>
+<footer role="contentinfo" aria-label="Site footer">
   <div class="footer-content">
     <div class="footer-section">
-      <img src="https://images.vitalswap.com/pay-with-vitalswap/1.png" alt="VitalSwap" class="preloader-logo">
+      <img src="https://images.vitalswap.com/pay-with-vitalswap/1.png" alt="VitalSwap company logo" class="preloader-logo">
       <p style="color: var(--gray-400); margin-bottom: 1rem;">The future of transparent decentralized trading.</p>
-      <div style="display: flex; gap: 1rem; justify-content: center;">
-        <a href="#" style="color: var(--secondary); font-size: 1.2rem;"><i class="fab fa-twitter"></i></a>
-        <a href="#" style="color: var(--secondary); font-size: 1.2rem;"><i class="fab fa-discord"></i></a>
-        <a href="#" style="color: var(--secondary); font-size: 1.2rem;"><i class="fab fa-telegram"></i></a>
-        <a href="#" style="color: var(--secondary); font-size: 1.2rem;"><i class="fab fa-github"></i></a>
-      </div>
+      <nav aria-label="Social media links" style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="#" style="color: var(--secondary); font-size: 1.2rem;" aria-label="Follow us on Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+        <a href="#" style="color: var(--secondary); font-size: 1.2rem;" aria-label="Join our Discord community"><i class="fab fa-discord" aria-hidden="true"></i></a>
+        <a href="#" style="color: var(--secondary); font-size: 1.2rem;" aria-label="Connect on Telegram"><i class="fab fa-telegram" aria-hidden="true"></i></a>
+        <a href="#" style="color: var(--secondary); font-size: 1.2rem;" aria-label="View our GitHub repository"><i class="fab fa-github" aria-hidden="true"></i></a>
+      </nav>
     </div>
     
     <div class="footer-section">
@@ -4767,6 +5004,14 @@ function setupCalculator() {
       return;
     }
     
+    if (!validateAmount(amount)) {
+      resetFeeDisplay('Enter Valid Amount', currencySymbol);
+      return;
+    }
+    
+    // Show loading state while calculating
+    showLoadingState();
+    
     const service = feeData[accountType][serviceType][specificIndex];
     const feeStr = service.Fee;
     
@@ -4813,7 +5058,12 @@ function setupCalculator() {
       
       if (dollarMatch) {
         const feeInUSD = parseFloat(dollarMatch[1]);
-        calculatedFeeInSelectedCurrency = await convertCurrencyAmount(feeInUSD, 'USD', selectedCurrency);
+        try {
+          calculatedFeeInSelectedCurrency = await convertCurrencyAmount(feeInUSD, 'USD', selectedCurrency);
+        } catch (error) {
+          showToast('Currency conversion failed. Using original currency.', 'warning');
+          calculatedFeeInSelectedCurrency = selectedCurrency === 'USD' ? feeInUSD : 0;
+        }
         
         if (selectedCurrency === 'USD') {
           feeDisplay = `$${feeInUSD}`;
@@ -4827,7 +5077,12 @@ function setupCalculator() {
         }
       } else if (nairaMatch) {
         const feeInNGN = parseFloat(nairaMatch[1].replace(',', ''));
-        calculatedFeeInSelectedCurrency = await convertCurrencyAmount(feeInNGN, 'NGN', selectedCurrency);
+        try {
+          calculatedFeeInSelectedCurrency = await convertCurrencyAmount(feeInNGN, 'NGN', selectedCurrency);
+        } catch (error) {
+          showToast('Currency conversion failed. Using original currency.', 'warning');
+          calculatedFeeInSelectedCurrency = selectedCurrency === 'NGN' ? feeInNGN : 0;
+        }
         
         if (selectedCurrency === 'NGN') {
           feeDisplay = `₦${feeInNGN.toLocaleString()}`;
@@ -4854,18 +5109,47 @@ function setupCalculator() {
       totalLabelEl.textContent = 'You Pay';
     }
     
+    // Save calculation to recent history
+    saveRecentCalculation({
+      amount,
+      currency: selectedCurrency,
+      service: service.Service,
+      fee: calculatedFeeInSelectedCurrency,
+      total: youPayReceive
+    });
+    
     // Update display
     feeResult.innerHTML = `
       <div style="display: flex; align-items: center; gap: 1rem; justify-content: center;">
-        <i class="fas fa-calculator"></i>
+        <i class="fas fa-calculator" aria-hidden="true"></i>
         <span>${service.Service}: ${feeDisplay}</span>
       </div>
     `;
     feeResult.classList.add('active');
     
-    networkFeeEl.textContent = feeStr === 'FREE' ? 'FREE' : `${currencySymbol}${calculatedFeeInSelectedCurrency.toFixed(2)}`;
+    const feeAmount = feeStr === 'FREE' ? 'FREE' : `${currencySymbol}${calculatedFeeInSelectedCurrency.toFixed(2)}`;
+    
+    // Add visual feedback for changes
+    networkFeeEl.classList.add('value-change');
+    totalFeeEl.classList.add('value-change');
+    
+    networkFeeEl.textContent = feeAmount;
     platformFeeEl.textContent = service.Service;
     totalFeeEl.textContent = `${currencySymbol}${youPayReceive.toFixed(2)}`;
+    
+    // Remove animation classes after animation completes
+    setTimeout(() => {
+      networkFeeEl.classList.remove('value-change');
+      totalFeeEl.classList.remove('value-change');
+    }, 2000);
+    
+    // Announce results to screen reader
+    announceCalculationResult(
+      service.Service,
+      feeAmount,
+      `${currencySymbol}${youPayReceive.toFixed(2)}`,
+      selectedCurrency
+    );
     
     setTimeout(() => feeResult.classList.remove('active'), 500);
   }
@@ -4876,6 +5160,41 @@ function setupCalculator() {
     platformFeeEl.textContent = message;
     totalFeeEl.textContent = `${currencySymbol}0.00`;
     document.getElementById('totalLabel').textContent = 'You Pay/Receive';
+  }
+  
+  function showLoadingState() {
+    feeResult.innerHTML = '<div class="skeleton skeleton-text"></div>';
+    networkFeeEl.innerHTML = '<div class="skeleton skeleton-text"></div>';
+    totalFeeEl.innerHTML = '<div class="skeleton skeleton-text"></div>';
+    announceLoading('Calculating fees, please wait');
+  }
+  
+  function validateAmount(amount) {
+    const errorEl = document.getElementById('amountError');
+    const inputEl = document.getElementById('tradeAmount');
+    
+    if (amount < 0) {
+      const errorMsg = 'Amount cannot be negative';
+      errorEl.innerHTML = `<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ${errorMsg}`;
+      errorEl.style.display = 'flex';
+      inputEl.classList.add('input-error');
+      inputEl.setAttribute('aria-invalid', 'true');
+      announceError(errorMsg);
+      return false;
+    } else if (amount > 1000000) {
+      const errorMsg = 'Amount too large, maximum is 1,000,000';
+      errorEl.innerHTML = `<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ${errorMsg}`;
+      errorEl.style.display = 'flex';
+      inputEl.classList.add('input-error');
+      inputEl.setAttribute('aria-invalid', 'true');
+      announceError(errorMsg);
+      return false;
+    } else {
+      errorEl.style.display = 'none';
+      inputEl.classList.remove('input-error');
+      inputEl.setAttribute('aria-invalid', 'false');
+      return true;
+    }
   }
   
   accountTypeSelect.addEventListener('change', populateServiceTypes);
@@ -4890,7 +5209,66 @@ function setupCalculator() {
     radio.addEventListener('change', calculateFee);
   });
   
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      // Ensure proper tab order
+      const focusableElements = document.querySelectorAll('select, input, button, [tabindex]:not([tabindex="-1"])');
+      const currentIndex = Array.from(focusableElements).indexOf(document.activeElement);
+      
+      if (e.shiftKey && currentIndex === 0) {
+        e.preventDefault();
+        focusableElements[focusableElements.length - 1].focus();
+      } else if (!e.shiftKey && currentIndex === focusableElements.length - 1) {
+        e.preventDefault();
+        focusableElements[0].focus();
+      }
+    }
+    
+    // Enter key to calculate
+    if (e.key === 'Enter' && document.activeElement.id === 'tradeAmount') {
+      calculateFee();
+    }
+  });
+  
+  // Real-time validation
+  amountInput.addEventListener('input', (e) => {
+    const amount = parseFloat(e.target.value) || 0;
+    validateAmount(amount);
+  });
+  
   populateServiceTypes();
+  loadRecentCalculations();
+}
+
+// Recent calculations functionality
+function saveRecentCalculation(calc) {
+  let recent = JSON.parse(localStorage.getItem('recentCalculations') || '[]');
+  
+  // Add new calculation
+  recent.unshift(calc);
+  
+  // Keep only last 10 calculations
+  recent = recent.slice(0, 10);
+  
+  localStorage.setItem('recentCalculations', JSON.stringify(recent));
+  updateRecentAmounts();
+}
+
+function loadRecentCalculations() {
+  updateRecentAmounts();
+}
+
+function updateRecentAmounts() {
+  const recent = JSON.parse(localStorage.getItem('recentCalculations') || '[]');
+  const datalist = document.getElementById('recentAmounts');
+  
+  // Get unique amounts
+  const uniqueAmounts = [...new Set(recent.map(calc => calc.amount))];
+  
+  datalist.innerHTML = uniqueAmounts.slice(0, 5).map(amount => 
+    `<option value="${amount}">${amount}</option>`
+  ).join('');
 }
 
 // FAQ FUNCTIONALITY
@@ -4899,19 +5277,41 @@ function setupFAQ() {
   
   faqItems.forEach(item => {
     const question = item.querySelector('.faq-question');
+    const answer = item.querySelector('.faq-answer');
     
     question.addEventListener('click', () => {
-      const isActive = item.classList.contains('active');
+      const isExpanded = question.getAttribute('aria-expanded') === 'true';
       
       // Close all other items
       faqItems.forEach(otherItem => {
+        const otherQuestion = otherItem.querySelector('.faq-question');
+        const otherAnswer = otherItem.querySelector('.faq-answer');
         if (otherItem !== item) {
           otherItem.classList.remove('active');
+          otherQuestion.setAttribute('aria-expanded', 'false');
         }
       });
       
       // Toggle current item
-      item.classList.toggle('active', !isActive);
+      const newState = !isExpanded;
+      item.classList.toggle('active', newState);
+      question.setAttribute('aria-expanded', newState.toString());
+      
+      // Announce to screen reader
+      const questionText = question.querySelector('span').textContent;
+      if (newState) {
+        announceToScreenReader(`Expanded: ${questionText}`);
+      } else {
+        announceToScreenReader(`Collapsed: ${questionText}`);
+      }
+    });
+    
+    // Keyboard support
+    question.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        question.click();
+      }
     });
   });
 }
@@ -5234,12 +5634,28 @@ function setupDarkMode() {
   const themeToggle = document.getElementById('themeToggle');
   const body = document.body;
   
-  // Check for saved theme
+  // Auto-detect system preference
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
   const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'dark') {
+  
+  // Apply theme based on saved preference or system preference
+  if (savedTheme === 'dark' || (!savedTheme && prefersDark.matches)) {
     body.classList.add('dark-mode');
     themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
   }
+  
+  // Listen for system theme changes
+  prefersDark.addEventListener('change', (e) => {
+    if (!localStorage.getItem('theme')) {
+      if (e.matches) {
+        body.classList.add('dark-mode');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+      } else {
+        body.classList.remove('dark-mode');
+        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+      }
+    }
+  });
   
   themeToggle.addEventListener('click', () => {
     body.classList.toggle('dark-mode');
@@ -5567,8 +5983,46 @@ function setupFeaturesCarousel() {
   startAutoScroll();
 }
 
+// Focus management for accessibility without visual disruption
+function initializeFocusManagement() {
+  // Add focus-visible polyfill behavior
+  let hadKeyboardEvent = true;
+  const keyboardThrottleTimeout = 100;
+  
+  function onPointerDown() {
+    hadKeyboardEvent = false;
+  }
+  
+  function onKeyDown(e) {
+    if (e.metaKey || e.altKey || e.ctrlKey) {
+      return;
+    }
+    hadKeyboardEvent = true;
+  }
+  
+  function onFocus(e) {
+    if (hadKeyboardEvent || e.target.matches(':focus-visible')) {
+      e.target.classList.add('focus-visible');
+    }
+  }
+  
+  function onBlur(e) {
+    e.target.classList.remove('focus-visible');
+  }
+  
+  document.addEventListener('keydown', onKeyDown, true);
+  document.addEventListener('mousedown', onPointerDown, true);
+  document.addEventListener('pointerdown', onPointerDown, true);
+  document.addEventListener('touchstart', onPointerDown, true);
+  document.addEventListener('focus', onFocus, true);
+  document.addEventListener('blur', onBlur, true);
+  
+  document.body.classList.add('js-focus-visible');
+}
+
 // INITIALIZE EVERYTHING
 document.addEventListener('DOMContentLoaded', async () => {
+  initializeFocusManagement();
   hidePreloader();
   createParticles();
   createLasers();
