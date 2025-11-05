@@ -1,0 +1,49 @@
+{
+  "name": "VitalSwap - Transparent Fee Calculator & Virtual Banking",
+  "short_name": "VitalSwap",
+  "description": "Transparent fee calculation with live virtual banking consultations. Built by Team AlgoNauts for modern digital banking experiences.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "categories": ["finance", "business", "productivity"],
+  "icons": [
+    {
+      "src": "https://images.vitalswap.com/pay-with-vitalswap/1.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://images.vitalswap.com/pay-with-vitalswap/1.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/1.jpeg",
+      "sizes": "144x144",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Fee Calculator",
+      "short_name": "Calculator",
+      "description": "Calculate fees for any VitalSwap service",
+      "url": "/#calculator",
+      "icons": [{ "src": "/1.jpeg", "sizes": "96x96" }]
+    },
+    {
+      "name": "Virtual Booth",
+      "short_name": "Booth",
+      "description": "Connect with banking agents via video",
+      "url": "/my-webrtc-app/public/index.html",
+      "icons": [{ "src": "/1.jpeg", "sizes": "96x96" }]
+    }
+  ]
+}

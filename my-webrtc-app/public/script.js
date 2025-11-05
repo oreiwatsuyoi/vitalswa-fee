@@ -31,15 +31,70 @@ let animationFrameId;
 let outputCanvas, canvasCtx;
 
 // --- Firebase Configuration ---
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
-const auth = firebase.auth();
+let appDatabase, appAuth;
+
+// Initialize Firebase when config is available
+async function initializeFirebase() {
+    try {
+        if (typeof firebase === 'undefined') {
+            console.warn('⚠️ Firebase SDK not loaded');
+            return false;
+        }
+        
+        // Check if already initialized
+        if (firebase.apps.length > 0) {
+            appDatabase = firebase.database();
+            appAuth = firebase.auth();
+            console.log('✅ Using existing Firebase app');
+            return true;
+        }
+        
+        // Try to get config from available sources
+        let config = null;
+        
+        // Check if firebaseConfig is available globally
+        if (typeof firebaseConfig !== 'undefined') {
+            config = firebaseConfig;
+        }
+        
+        if (config) {
+            firebase.initializeApp(config);
+            appDatabase = firebase.database();
+            appAuth = firebase.auth();
+            console.log('✅ Firebase initialized successfully');
+            return true;
+        } else {
+            console.warn('⚠️ Firebase config not available');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Firebase initialization failed:', error);
+        return false;
+    }
+}
+
+// Try to initialize Firebase when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(async () => {
+        const initialized = await initializeFirebase();
+        if (!initialized) {
+            console.warn('Firebase initialization failed, retrying...');
+            setTimeout(async () => {
+                await initializeFirebase();
+            }, 2000);
+        }
+    }, 100);
+});
 
 // --- Customer Authentication ---
 let currentCustomer = null;
 
 // Setup auth state listener
-auth.onAuthStateChanged(handleCustomerAuthStateChange);
+setTimeout(() => {
+    if (appAuth) {
+        appAuth.onAuthStateChanged(handleCustomerAuthStateChange);
+    }
+}, 1000);
 
 function handleCustomerAuthStateChange(user) {
     if (user) {
@@ -117,7 +172,7 @@ async function signInWithGoogle() {
         provider.addScope('profile');
         provider.addScope('email');
         
-        const result = await auth.signInWithPopup(provider);
+        const result = await appAuth.signInWithPopup(provider);
         showNotification(`Welcome, ${result.user.displayName}!`, 'success');
         
     } catch (error) {
@@ -142,7 +197,7 @@ async function signInWithGoogle() {
 
 async function signOut() {
     try {
-        await auth.signOut();
+        await appAuth.signOut();
         showNotification('Signed out successfully', 'info');
     } catch (error) {
         console.error('Sign-out error:', error);
@@ -223,7 +278,7 @@ function getOptimalVideoConstraints() {
     } else if (effectiveType === '3g') {
         return { width: { ideal: 320 }, height: { ideal: 240 }, frameRate: { ideal: 10 } };
     } else {
-        return { width: { ideal: 480 }, height: { ideal: 360 }, frameRate: { ideal: 15 } };
+        return { width: { ideal: 1280, max: 1920 }, height: { ideal: 720, max: 1080 }, frameRate: { ideal: 30 } };
     }
 }
 
@@ -293,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Show sign-in prompt after a delay if not signed in and auth is ready
     setTimeout(() => {
-        if (!currentCustomer && auth.currentUser === null) {
+        if (!currentCustomer && appAuth && appAuth.currentUser === null) {
             showCustomerSignIn();
         }
     }, 5000);
@@ -360,7 +415,7 @@ function setupEventListeners() {
 
     if (lobbyMuteAudio) lobbyMuteAudio.addEventListener('click', toggleLobbyAudio);
     if (lobbyMuteVideo) lobbyMuteVideo.addEventListener('click', toggleLobbyVideo);
-    if (joinCallBtn) joinCallBtn.addEventListener('click', startComplianceSession);
+    if (joinCallBtn) joinCallBtn.addEventListener('click', joinCall);
     if (audioInput) audioInput.addEventListener('change', updateLobbyDevices);
     if (videoInput) videoInput.addEventListener('change', updateLobbyDevices);
 
@@ -450,22 +505,45 @@ async function handleAccessCode(event) {
         
         if (isValid) {
             roomName = accessCode;
+            // Store for WebRTC script - ensure all storage methods have the code
+            sessionStorage.setItem('validatedAccessCode', accessCode);
+            sessionStorage.setItem('roomName', accessCode);
+            window.currentAccessCode = accessCode;
+            window.roomName = accessCode;
             showLobby();
         } else {
             throw new Error('Invalid access code');
         }
         
     } catch (error) {
-        showError('Invalid access code. Please check with your banking representative.');
+        console.error('Access code validation error:', error);
+        // Reset button state
         connectBtn.disabled = false;
         connectBtn.innerHTML = '<span>Connect to Agent</span>';
+        
+        // Check if Firebase is available
+        if (!appDatabase) {
+            showError('Connection issue. Please refresh the page and try again.');
+        } else {
+            showError('Invalid access code. Please check with your banking representative.');
+        }
     }
 }
 
 // --- Access Code Validation ---
 async function validateAccessCode(code) {
     try {
-        const codesRef = database.ref('access-codes');
+        if (!appDatabase) {
+            console.warn('Database not initialized, using demo validation');
+            return ['DEMO01', 'TEST01', 'BANK01'].includes(code);
+        }
+        
+        // Ensure anonymous authentication for mobile
+        if (!appAuth.currentUser) {
+            await appAuth.signInAnonymously();
+        }
+        
+        const codesRef = appDatabase.ref('access-codes');
         const snapshot = await codesRef.child(code).once('value');
         const codeData = snapshot.val();
         
@@ -538,16 +616,17 @@ async function getClientIP() {
         const data = await response.json();
         return data.ip;
     } catch (error) {
-        return 'unknown';
+        console.log('IP fetch blocked by CSP, using fallback');
+        return 'csp-blocked';
     }
 }
 
 // --- Get Agent Info from Firebase ---
 async function getAgentInfo(agentId) {
-    if (!database || !agentId) return null;
+    if (!appDatabase || !agentId) return null;
     
     try {
-        const snapshot = await database.ref('agents').child(agentId).once('value');
+        const snapshot = await appDatabase.ref('agents').child(agentId).once('value');
         const agentData = snapshot.val();
         
         if (agentData) {
@@ -619,7 +698,10 @@ async function setupLobby() {
         // Get user media with adaptive quality
         const videoConstraints = getOptimalVideoConstraints();
         lobbyStream = await navigator.mediaDevices.getUserMedia({ 
-            video: videoConstraints,
+            video: {
+                ...videoConstraints,
+                facingMode: 'user'
+            },
             audio: {
                 echoCancellation: true,
                 noiseSuppression: true,
@@ -630,10 +712,18 @@ async function setupLobby() {
         const lobbyVideo = document.getElementById('lobby-video');
         if (lobbyVideo) {
             lobbyVideo.srcObject = lobbyStream;
+            lobbyVideo.muted = true;
+            lobbyVideo.playsInline = true;
+            lobbyVideo.autoplay = true;
+            
+            // Ensure video plays
+            lobbyVideo.play().catch(e => console.log('Video autoplay prevented:', e));
         }
 
         // Populate device selectors
         await populateDeviceSelectors();
+        
+        console.log('✅ Lobby setup complete with video stream');
         
     } catch (error) {
         console.error('Error setting up lobby:', error);
@@ -703,15 +793,18 @@ function toggleLobbyVideo() {
         const btn = document.getElementById('lobby-mute-video');
         const camOn = document.getElementById('cam-on');
         const camOff = document.getElementById('cam-off');
+        const lobbyVideo = document.getElementById('lobby-video');
         
         if (isVideoMuted) {
             btn.classList.add('active');
             camOn.style.display = 'none';
             camOff.style.display = 'block';
+            if (lobbyVideo) lobbyVideo.style.visibility = 'hidden';
         } else {
             btn.classList.remove('active');
             camOn.style.display = 'block';
             camOff.style.display = 'none';
+            if (lobbyVideo) lobbyVideo.style.visibility = 'visible';
         }
     }
 }
@@ -728,9 +821,14 @@ async function updateLobbyDevices() {
         const videoSelect = document.getElementById('video-input');
         
         const constraints = {
-            audio: { deviceId: { exact: audioSelect.value } },
+            audio: { 
+                deviceId: audioSelect?.value ? { exact: audioSelect.value } : true,
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+            },
             video: { 
-                deviceId: { exact: videoSelect.value },
+                deviceId: videoSelect?.value ? { exact: videoSelect.value } : true,
                 width: { ideal: 1280 }, 
                 height: { ideal: 720 },
                 frameRate: { ideal: 30 }
@@ -742,7 +840,13 @@ async function updateLobbyDevices() {
         const lobbyVideo = document.getElementById('lobby-video');
         if (lobbyVideo) {
             lobbyVideo.srcObject = lobbyStream;
+            lobbyVideo.muted = true;
+            lobbyVideo.playsInline = true;
+            lobbyVideo.autoplay = true;
+            lobbyVideo.play().catch(e => console.log('Video autoplay prevented:', e));
         }
+        
+        console.log('✅ Lobby devices updated successfully');
         
     } catch (error) {
         console.error('Error updating devices:', error);
@@ -755,10 +859,10 @@ async function joinCall() {
     console.log('🚀 Starting joinCall process...');
     try {
         // Generate unique ID
-        myId = database.ref().push().key;
+        myId = appDatabase.ref().push().key;
         console.log('📱 Generated user ID:', myId);
         
-        roomRef = database.ref('rooms/' + roomName);
+        roomRef = appDatabase.ref('rooms/' + roomName);
         console.log('🏠 Room reference created for:', roomName);
         
         // Clean up any stale room data older than 5 minutes
@@ -777,10 +881,31 @@ async function joinCall() {
         // Generate unique session ID
         const sessionId = 'VS-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 5);
         
+        // Get validated access code with multiple fallbacks
+        const validatedCode = sessionStorage.getItem('validatedAccessCode') || 
+                             window.currentAccessCode || 
+                             sessionStorage.getItem('roomName') || 
+                             window.roomName || 
+                             roomName;
+        
+        // Ensure we have a valid access code
+        if (!validatedCode || validatedCode === 'undefined') {
+            console.error('No valid access code found. Available values:', {
+                sessionStorage: sessionStorage.getItem('validatedAccessCode'),
+                windowCurrent: window.currentAccessCode,
+                sessionRoomName: sessionStorage.getItem('roomName'),
+                windowRoomName: window.roomName,
+                roomName: roomName
+            });
+            throw new Error('No valid access code available');
+        }
+        
+        console.log('Using access code:', validatedCode);
+        
         // Create session record
         const sessionData = {
             sessionId: sessionId,
-            accessCode: roomName,
+            accessCode: validatedCode,
             agentId: window.assignedAgent?.id || 'agent_' + Date.now(),
             agentName: window.assignedAgent?.name || 'Banking Agent',
             customerName: currentCustomer?.name || 'Customer',
@@ -795,7 +920,7 @@ async function joinCall() {
         };
         
         console.log('💾 Storing session data:', sessionData);
-        await database.ref('sessions').child(myId).set(sessionData);
+        await appDatabase.ref('sessions').child(myId).set(sessionData);
         
         // Update room activity
         await roomRef.child('lastActivity').set(Date.now());
@@ -842,44 +967,42 @@ async function startCall() {
         const audioSelect = document.getElementById('audio-input');
         const videoSelect = document.getElementById('video-input');
         
+        const videoConstraints = getOptimalVideoConstraints();
         const constraints = {
-            audio: { deviceId: { exact: audioSelect.value } },
+            audio: { 
+                deviceId: audioSelect?.value ? { ideal: audioSelect.value } : true,
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+            },
             video: { 
-                deviceId: { exact: videoSelect.value },
-                width: { ideal: 1280 }, 
-                height: { ideal: 720 },
-                frameRate: { ideal: 30 }
+                deviceId: videoSelect?.value ? { ideal: videoSelect.value } : true,
+                facingMode: 'user',
+                ...videoConstraints
             }
         };
         
-        rawCameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+        // Get fresh stream for the call
+        localStream = await navigator.mediaDevices.getUserMedia(constraints);
+        rawCameraStream = localStream;
         
-        // Setup canvas for virtual background
+        // Setup local video display
         const localVideo = document.getElementById('local-video');
         if (localVideo) {
-            localVideo.srcObject = rawCameraStream;
+            localVideo.srcObject = localStream;
+            localVideo.muted = true;
+            localVideo.playsInline = true;
+            localVideo.autoplay = true;
         }
         
-        // Wait for video metadata
-        await new Promise((resolve) => {
-            localVideo.onloadedmetadata = resolve;
-        });
-        
-        // Initialize canvas
-        outputCanvas = document.getElementById('output-canvas');
-        if (!outputCanvas) {
-            outputCanvas = document.createElement('canvas');
-            outputCanvas.id = 'output-canvas';
-            outputCanvas.style.display = 'none';
-            document.body.appendChild(outputCanvas);
+        // Setup PiP video
+        const pipVideo = document.querySelector('.local-video-pip video');
+        if (pipVideo) {
+            pipVideo.srcObject = localStream;
+            pipVideo.muted = true;
+            pipVideo.playsInline = true;
+            pipVideo.autoplay = true;
         }
-        
-        canvasCtx = outputCanvas.getContext('2d');
-        outputCanvas.width = localVideo.videoWidth;
-        outputCanvas.height = localVideo.videoHeight;
-        
-        // Use camera stream directly for better performance
-        localStream = rawCameraStream;
         
         // Add local video to grid
         addParticipantVideo('local', localStream, true);
@@ -890,6 +1013,8 @@ async function startCall() {
         
         // Setup chat listener
         setupChatListener();
+        
+        console.log('✅ Call started successfully with local stream');
         
     } catch (error) {
         console.error('Error starting call:', error);
@@ -1178,8 +1303,8 @@ function closePeerConnection(otherUserId) {
 function updateParticipantCount() {
     const participantCount = Object.keys(participants).length + 1; // +1 for self
     
-    if (database && myId) {
-        database.ref('sessions').child(myId).update({
+    if (appDatabase && myId) {
+        appDatabase.ref('sessions').child(myId).update({
             participants: participantCount,
             lastActivity: Date.now()
         }).catch(error => console.error('Error updating participant count:', error));
@@ -1214,6 +1339,8 @@ setInterval(() => {
 }, 60000); // Check every minute
 
 // --- Multi-Participant Video Management ---
+let fullscreenVideo = null;
+
 function addParticipantVideo(userId, stream, isLocal = false) {
     const videoGrid = document.getElementById('video-grid');
     if (!videoGrid) return;
@@ -1226,7 +1353,7 @@ function addParticipantVideo(userId, stream, isLocal = false) {
     
     // Create video container
     const videoContainer = document.createElement('div');
-    videoContainer.className = 'video-container';
+    videoContainer.className = `video-container ${isLocal ? 'local-video' : ''}`;
     videoContainer.id = `video-${userId}`;
     
     // Create video element
@@ -1244,7 +1371,6 @@ function addParticipantVideo(userId, stream, isLocal = false) {
     if (isLocal) {
         label.innerHTML = '👤 You';
     } else {
-        // Get participant info from participants object or use default
         const participantInfo = participants[userId] || { displayName: 'Participant' };
         label.innerHTML = `🏦 ${participantInfo.displayName}`;
     }
@@ -1254,13 +1380,52 @@ function addParticipantVideo(userId, stream, isLocal = false) {
     statusIndicator.className = 'connection-status connected';
     statusIndicator.id = `status-${userId}`;
     
+    // Add fullscreen toggle for non-local videos in 3+ participant calls
+    if (!isLocal) {
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'fullscreen-btn';
+        fullscreenBtn.innerHTML = '⛶';
+        fullscreenBtn.style.cssText = `
+            position: absolute;
+            top: 12px;
+            right: 40px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 20;
+            display: none;
+        `;
+        fullscreenBtn.onclick = () => toggleFullscreen(userId);
+        videoContainer.appendChild(fullscreenBtn);
+        
+        // Show fullscreen button on hover
+        videoContainer.addEventListener('mouseenter', () => {
+            if (getParticipantCount() > 2) {
+                fullscreenBtn.style.display = 'block';
+            }
+        });
+        videoContainer.addEventListener('mouseleave', () => {
+            fullscreenBtn.style.display = 'none';
+        });
+    }
+    
     // Assemble container
     videoContainer.appendChild(video);
     videoContainer.appendChild(label);
     videoContainer.appendChild(statusIndicator);
     
-    // Add to grid
-    videoGrid.appendChild(videoContainer);
+    // Add to grid or PiP
+    if (isLocal) {
+        videoGrid.appendChild(videoContainer);
+        updateLocalVideoPiP(stream);
+    } else {
+        videoGrid.appendChild(videoContainer);
+    }
     
     console.log('➕ Added participant video:', userId);
 }
@@ -1277,7 +1442,7 @@ function updateVideoGrid() {
     const videoGrid = document.getElementById('video-grid');
     if (!videoGrid) return;
     
-    const participantCount = videoGrid.children.length;
+    const participantCount = getParticipantCount();
     
     // Remove all participant count classes
     videoGrid.className = 'video-grid';
@@ -1287,7 +1452,112 @@ function updateVideoGrid() {
         videoGrid.classList.add(`participants-${Math.min(participantCount, 9)}`);
     }
     
+    // Manage PiP visibility
+    const pipElement = document.querySelector('.local-video-pip');
+    if (pipElement) {
+        if (participantCount === 2) {
+            pipElement.classList.remove('hidden');
+        } else {
+            pipElement.classList.add('hidden');
+        }
+    }
+    
     console.log(`📋 Updated video grid for ${participantCount} participants`);
+}
+
+function getParticipantCount() {
+    const videoGrid = document.getElementById('video-grid');
+    return videoGrid ? videoGrid.children.length : 0;
+}
+
+function updateLocalVideoPiP(stream) {
+    let pipElement = document.querySelector('.local-video-pip');
+    
+    if (!pipElement) {
+        pipElement = document.createElement('div');
+        pipElement.className = 'local-video-pip';
+        
+        const pipVideo = document.createElement('video');
+        pipVideo.className = 'video-element';
+        pipVideo.autoplay = true;
+        pipVideo.playsinline = true;
+        pipVideo.muted = true;
+        pipVideo.srcObject = stream;
+        
+        const pipLabel = document.createElement('div');
+        pipLabel.className = 'participant-label customer';
+        pipLabel.innerHTML = '👤 You';
+        
+        pipElement.appendChild(pipVideo);
+        pipElement.appendChild(pipLabel);
+        
+        // Add click to swap functionality
+        pipElement.onclick = () => swapMainVideo();
+        
+        document.querySelector('.video-area').appendChild(pipElement);
+    } else {
+        const pipVideo = pipElement.querySelector('video');
+        if (pipVideo) {
+            pipVideo.srcObject = stream;
+        }
+    }
+}
+
+function toggleFullscreen(userId) {
+    const videoContainer = document.getElementById(`video-${userId}`);
+    if (!videoContainer) return;
+    
+    if (fullscreenVideo === userId) {
+        // Exit fullscreen
+        videoContainer.classList.remove('fullscreen');
+        fullscreenVideo = null;
+        updateVideoGrid();
+    } else {
+        // Enter fullscreen
+        if (fullscreenVideo) {
+            const currentFullscreen = document.getElementById(`video-${fullscreenVideo}`);
+            if (currentFullscreen) {
+                currentFullscreen.classList.remove('fullscreen');
+            }
+        }
+        videoContainer.classList.add('fullscreen');
+        fullscreenVideo = userId;
+    }
+}
+
+function swapMainVideo() {
+    // For 2-participant calls, swap main and PiP videos
+    if (getParticipantCount() !== 2) return;
+    
+    const videoGrid = document.getElementById('video-grid');
+    const pipElement = document.querySelector('.local-video-pip');
+    
+    if (!videoGrid || !pipElement) return;
+    
+    const mainVideo = videoGrid.querySelector('.video-container:not(.local-video)');
+    const localVideo = videoGrid.querySelector('.video-container.local-video');
+    
+    if (mainVideo && localVideo) {
+        // Swap the streams
+        const mainStream = mainVideo.querySelector('video').srcObject;
+        const localStream = localVideo.querySelector('video').srcObject;
+        
+        mainVideo.querySelector('video').srcObject = localStream;
+        localVideo.querySelector('video').srcObject = mainStream;
+        pipElement.querySelector('video').srcObject = mainStream;
+        
+        // Swap labels
+        const mainLabel = mainVideo.querySelector('.participant-label');
+        const localLabel = localVideo.querySelector('.participant-label');
+        
+        const tempLabel = mainLabel.innerHTML;
+        mainLabel.innerHTML = localLabel.innerHTML;
+        localLabel.innerHTML = tempLabel;
+        
+        // Update classes
+        mainLabel.className = mainLabel.className.includes('agent') ? 'participant-label customer' : 'participant-label agent';
+        localLabel.className = localLabel.className.includes('customer') ? 'participant-label agent' : 'participant-label customer';
+    }
 }
 
 function updateConnectionStatus(userId, status) {
@@ -1319,13 +1589,21 @@ function toggleAudio() {
             audioOn.style.display = 'block';
             audioOff.style.display = 'none';
         }
+        
+        // Update all peer connections with the new track state
+        Object.values(peerConnections).forEach(pc => {
+            const sender = pc.getSenders().find(s => s.track && s.track.kind === 'audio');
+            if (sender && sender.track) {
+                sender.track.enabled = audioTrack.enabled;
+            }
+        });
     }
 }
 
 async function toggleVideo() {
-    if (!rawCameraStream) return;
+    if (!localStream) return;
     
-    const videoTrack = rawCameraStream.getVideoTracks()[0];
+    const videoTrack = localStream.getVideoTracks()[0];
     if (videoTrack) {
         videoTrack.enabled = !videoTrack.enabled;
         isVideoMuted = !videoTrack.enabled;
@@ -1333,25 +1611,30 @@ async function toggleVideo() {
         const btn = document.getElementById('mute-video');
         const videoOn = document.getElementById('video-on');
         const videoOff = document.getElementById('video-off');
+        const localVideo = document.getElementById('local-video');
+        const pipVideo = document.querySelector('.local-video-pip video');
         
         if (isVideoMuted) {
             btn.classList.add('active');
             videoOn.style.display = 'none';
             videoOff.style.display = 'block';
+            if (localVideo) localVideo.style.visibility = 'hidden';
+            if (pipVideo) pipVideo.style.visibility = 'hidden';
         } else {
             btn.classList.remove('active');
             videoOn.style.display = 'block';
             videoOff.style.display = 'none';
+            if (localVideo) localVideo.style.visibility = 'visible';
+            if (pipVideo) pipVideo.style.visibility = 'visible';
         }
         
-        // Manage processing loop
-        if (videoTrack.enabled) {
-            processFrame();
-        } else {
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
+        // Update all peer connections with the new track state
+        Object.values(peerConnections).forEach(pc => {
+            const sender = pc.getSenders().find(s => s.track && s.track.kind === 'video');
+            if (sender && sender.track) {
+                sender.track.enabled = videoTrack.enabled;
             }
-        }
+        });
     }
 }
 
@@ -1379,8 +1662,8 @@ function endCallHandler() {
 function endCall() {
     console.log('Ending call...');
     // Update session status
-    if (myId) {
-        database.ref('sessions').child(myId).update({
+    if (myId && appDatabase) {
+        appDatabase.ref('sessions').child(myId).update({
             status: 'ended',
             endTime: firebase.database.ServerValue.TIMESTAMP,
             duration: callStartTime ? Date.now() - callStartTime : 0
@@ -1797,7 +2080,7 @@ function sendAgentChatMessage() {
 }
 
 function sendQuickMessage(message) {
-    if (!database || !currentCustomer) return;
+    if (!appDatabase || !currentCustomer) return;
     
     const messageData = {
         text: message,
@@ -1810,7 +2093,7 @@ function sendQuickMessage(message) {
     };
     
     // Save to Firebase under customer-agent-chat (broadcast to all agents)
-    database.ref('customer-agent-chat').push(messageData);
+    appDatabase.ref('customer-agent-chat').push(messageData);
     
     // Add to local display
     addAgentChatMessage(messageData);
@@ -1841,10 +2124,10 @@ function addAgentChatMessage(messageData) {
 }
 
 function setupAgentChatListener() {
-    if (!database || !currentCustomer) return;
+    if (!appDatabase || !currentCustomer) return;
     
     // Listen for messages directed to this customer or broadcast messages
-    window.agentChatRef = database.ref('customer-agent-chat');
+    window.agentChatRef = appDatabase.ref('customer-agent-chat');
     window.agentChatRef.limitToLast(50).on('child_added', (snapshot) => {
         const messageData = snapshot.val();
         if (messageData && messageData.senderId !== currentCustomer.uid) {
@@ -1858,9 +2141,9 @@ function setupAgentChatListener() {
 }
 
 function loadAgentChatHistory() {
-    if (!database || !currentCustomer) return;
+    if (!appDatabase || !currentCustomer) return;
     
-    database.ref('customer-agent-chat').limitToLast(50).once('value', (snapshot) => {
+    appDatabase.ref('customer-agent-chat').limitToLast(50).once('value', (snapshot) => {
         const messages = snapshot.val();
         if (messages) {
             Object.values(messages).forEach(messageData => {
@@ -1888,17 +2171,17 @@ class ComplianceManager {
             timestamp: Date.now(),
             event: event,
             userId: currentCustomer?.uid || 'anonymous',
-            sessionId: myId,
-            data: data,
-            ipAddress: 'masked', // Would get real IP in production
+            sessionId: myId || 'unknown',
+            data: data || {},
+            ipAddress: 'masked',
             userAgent: navigator.userAgent.substring(0, 100)
         };
         
         this.sessionLogs.push(logEntry);
         
         // Store in Firebase for audit trail
-        if (database) {
-            database.ref('audit-logs').push(logEntry);
+        if (appDatabase && myId) {
+            appDatabase.ref('audit-logs').push(logEntry).catch(err => console.warn('Audit log failed:', err));
         }
     }
     
@@ -1997,8 +2280,8 @@ function endCallWithCompliance() {
     const report = compliance.generateComplianceReport();
     
     // Store compliance data
-    if (database && myId) {
-        database.ref('compliance-reports').child(myId).set(report);
+    if (appDatabase && myId) {
+        appDatabase.ref('compliance-reports').child(myId).set(report);
     }
     
     compliance.logEvent('SESSION_ENDED', {

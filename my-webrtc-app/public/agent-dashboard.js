@@ -804,7 +804,7 @@ function formatDuration(startTime) {
 function joinSession(sessionId) {
     const session = activeSessions.get(sessionId);
     if (session && session.accessCode) {
-        const sessionUrl = `${window.location.origin}?code=${session.accessCode}&agent=true`;
+        const sessionUrl = `./index.html?code=${session.accessCode}&agent=true`;
         const popup = window.open(sessionUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
         
         if (!popup) {
@@ -1453,7 +1453,7 @@ function initializeDashboard() {
 function joinSessionWithCode() {
     const code = document.getElementById('current-access-code').textContent;
     if (code && code !== 'ABC123') {
-        const sessionUrl = `${window.location.origin}?code=${code}&agent=true`;
+        const sessionUrl = `./index.html?code=${code}&agent=true`;
         window.open(sessionUrl, '_blank', 'width=1200,height=800');
     } else {
         showNotification('Please generate a valid access code first', 'warning');

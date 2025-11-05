@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://lh3.googleusercontent.com; media-src 'self' blob:; worker-src 'self' blob:;">
+
     <title>VitalSwap Virtual Booth - Connect with Your Personal Banking Agent</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -714,55 +714,69 @@
 
         .video-grid {
             flex: 1;
-            display: grid;
+            display: flex;
             gap: 16px;
             padding: 16px;
             position: relative;
         }
         
-        .video-grid.participants-1 {
-            grid-template-columns: 1fr;
+        /* 2 participants: main + PiP layout */
+        .video-grid.participants-2 {
+            flex-direction: column;
         }
         
-        .video-grid.participants-2 {
-            grid-template-columns: 1fr;
-            grid-template-rows: 1fr 1fr;
+        .video-grid.participants-2 .video-container:not(.local-video) {
+            flex: 1;
+        }
+        
+        .video-grid.participants-2 .video-container.local-video {
+            display: none; /* Hide in grid, show in PiP */
+        }
+        
+        /* 3+ participants: grid layout */
+        .video-grid.participants-3,
+        .video-grid.participants-4,
+        .video-grid.participants-5,
+        .video-grid.participants-6,
+        .video-grid.participants-7,
+        .video-grid.participants-8,
+        .video-grid.participants-9 {
+            display: grid;
+            gap: 12px;
         }
         
         .video-grid.participants-3 {
-            grid-template-columns: 1fr;
-            grid-template-rows: 1fr 1fr 1fr;
-        }
-        
-        /* Desktop layouts */
-        @media (min-width: 1025px) {
-            .video-grid.participants-2 {
-                grid-template-columns: 1fr 1fr;
-                grid-template-rows: 1fr;
-            }
-            
-            .video-grid.participants-3 {
-                grid-template-columns: 1fr 1fr 1fr;
-                grid-template-rows: 1fr;
-            }
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
         }
         
         .video-grid.participants-4 {
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
         }
         
         .video-grid.participants-5,
         .video-grid.participants-6 {
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
         }
         
         .video-grid.participants-7,
         .video-grid.participants-8,
         .video-grid.participants-9 {
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+        }
+        
+        /* Fullscreen mode */
+        .video-container.fullscreen {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 1500;
+            background: #000;
         }
 
         .video-container {
@@ -789,6 +803,17 @@
             border-radius: var(--border-radius);
             overflow: hidden;
             z-index: 100;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .local-video-pip:hover {
+            transform: scale(1.05);
+            border-color: var(--primary-blue);
+        }
+        
+        .local-video-pip.hidden {
+            display: none;
         }
         
         .participant-label {
@@ -1083,27 +1108,24 @@
             }
             
             .video-grid.participants-2 {
-                grid-template-columns: 1fr;
+                flex-direction: column;
+            }
+            
+            .video-grid.participants-3,
+            .video-grid.participants-4 {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
                 grid-template-rows: 1fr 1fr;
             }
             
-            .video-grid.participants-3 {
-                grid-template-columns: 1fr;
-                grid-template-rows: 1fr 1fr 1fr;
-            }
-            
-            .video-grid.participants-4,
             .video-grid.participants-5,
-            .video-grid.participants-6 {
-                grid-template-columns: 1fr 1fr;
-                grid-template-rows: 1fr 1fr 1fr;
-            }
-            
+            .video-grid.participants-6,
             .video-grid.participants-7,
             .video-grid.participants-8,
             .video-grid.participants-9 {
+                display: grid;
                 grid-template-columns: 1fr 1fr;
-                grid-template-rows: 1fr 1fr 1fr 1fr;
+                grid-template-rows: repeat(3, 1fr);
             }
         }
 
@@ -1260,11 +1282,24 @@
 
     <!-- External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    
+    <!-- TensorFlow and MediaPipe for Virtual Background -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core@3.11.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter@3.11.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@3.11.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-segmentation@1.0.1"></script>
+    
+    <!-- Main Application Script -->
+    <script src="script.js"></script>
 </head>
 <body>
     <!-- Loading Screen -->
